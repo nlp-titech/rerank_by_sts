@@ -45,7 +45,7 @@ def encode_and_save_batch(output_dir, model, t_batch_doc, max_doc_length, att_ma
 
 
 def encode_and_save(output_dir, docs, batch_size, tokenizer, model, device):
-    ids = list(docs.keys())[: int(batch_size * 3)]
+    ids = list(docs.keys())
     for i in tqdm(range(0, len(ids), batch_size)):
         batch_doc_did = ids[i : i + batch_size]
         batch_doc = [docs[did] for did in batch_doc_did]

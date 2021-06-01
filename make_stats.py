@@ -6,7 +6,7 @@ from pathlib import Path
 from tqdm import tqdm
 
 from load_bert_model import load_tokenizer
-from file_path_setteing import DF, DOC_LEN
+from file_path_setteing import DF, DOC_LEN, STATS
 
 
 def doc_stats(input_doc_path, tokenizer):
@@ -36,6 +36,7 @@ def doc_stats(input_doc_path, tokenizer):
 def main(args):
     input_doc_path = Path(args.input_doc)
     output_dir = Path(args.output_dir)
+    output_dir = output_dir / STATS
     output_dir.mkdir(parents=True, exist_ok=True)
     pretrain_model = args.pretrain_model
 
