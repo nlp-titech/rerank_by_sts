@@ -7,7 +7,6 @@
 #$ -m abe
 #$ -M iida.h.ac@m.titech.ac.jp
 
-
 dinput=$1
 qinput=$2
 OUTDIR=$3

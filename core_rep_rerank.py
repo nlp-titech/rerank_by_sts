@@ -45,6 +45,7 @@ def reranker_factory(
     q_embed_dir,
     d_embed_dir,
     doc_len_ave,
+    top_k=1000,
     window=5,
     bm25_k1=0.82,
     bm25_b=0.68,
@@ -52,7 +53,16 @@ def reranker_factory(
     if func_mode == DENSE:
         if pooler == CLS:
             reranker = DENSE_CLS_RERANKER(
-                idf, use_idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window
+                idf,
+                use_idf,
+                tokenizer,
+                retrieval_rank,
+                retrieval_score,
+                q_embed_dir,
+                d_embed_dir,
+                doc_len_ave,
+                top_k,
+                window,
             )
         elif pooler == AVE:
             reranker = DENSE_AVE_RERANKER(
@@ -64,6 +74,7 @@ def reranker_factory(
                 q_embed_dir,
                 d_embed_dir,
                 doc_len_ave,
+                top_k,
                 window=5,
             )
         elif pooler == MAX:
@@ -76,6 +87,7 @@ def reranker_factory(
                 q_embed_dir,
                 d_embed_dir,
                 doc_len_ave,
+                top_k,
                 window=5,
             )
         else:
@@ -85,15 +97,42 @@ def reranker_factory(
         # propose1
         if pooler == CLS:
             reranker = CLS_COEF_GLOBAL_RERANKER(
-                idf, use_idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window
+                idf,
+                use_idf,
+                tokenizer,
+                retrieval_rank,
+                retrieval_score,
+                q_embed_dir,
+                d_embed_dir,
+                doc_len_ave,
+                top_k,
+                window,
             )
         elif pooler == AVE:
             reranker = AVE_COEF_GLOBAL_RERANKER(
-                idf, use_idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window
+                idf,
+                use_idf,
+                tokenizer,
+                retrieval_rank,
+                retrieval_score,
+                q_embed_dir,
+                d_embed_dir,
+                doc_len_ave,
+                top_k,
+                window,
             )
         elif pooler == MAX:
             reranker = MAX_COEF_GLOBAL_RERANKER(
-                idf, use_idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window
+                idf,
+                use_idf,
+                tokenizer,
+                retrieval_rank,
+                retrieval_score,
+                q_embed_dir,
+                d_embed_dir,
+                doc_len_ave,
+                top_k,
+                window,
             )
         elif pooler == TOKEN:
             reranker = TOKEN_COEF_POOL_RERANKER(
@@ -105,6 +144,7 @@ def reranker_factory(
                 q_embed_dir,
                 d_embed_dir,
                 doc_len_ave,
+                top_k,
                 window,
                 AVE,
             )
@@ -118,6 +158,7 @@ def reranker_factory(
                 q_embed_dir,
                 d_embed_dir,
                 doc_len_ave,
+                top_k,
                 window,
                 AVE,
             )
@@ -126,15 +167,42 @@ def reranker_factory(
         # propose1
         if pooler == CLS:
             reranker = CLS_COEF_GLOBAL_RERANKER(
-                idf, use_idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window
+                idf,
+                use_idf,
+                tokenizer,
+                retrieval_rank,
+                retrieval_score,
+                q_embed_dir,
+                d_embed_dir,
+                doc_len_ave,
+                top_k,
+                window,
             )
         elif pooler == AVE:
             reranker = AVE_COEF_GLOBAL_RERANKER(
-                idf, use_idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window
+                idf,
+                use_idf,
+                tokenizer,
+                retrieval_rank,
+                retrieval_score,
+                q_embed_dir,
+                d_embed_dir,
+                doc_len_ave,
+                top_k,
+                window,
             )
         elif pooler == MAX:
             reranker = MAX_COEF_GLOBAL_RERANKER(
-                idf, use_idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window
+                idf,
+                use_idf,
+                tokenizer,
+                retrieval_rank,
+                retrieval_score,
+                q_embed_dir,
+                d_embed_dir,
+                doc_len_ave,
+                top_k,
+                window,
             )
         elif pooler == TOKEN:
             reranker = TOKEN_COEF_POOL_RERANKER(
@@ -146,6 +214,7 @@ def reranker_factory(
                 q_embed_dir,
                 d_embed_dir,
                 doc_len_ave,
+                top_k,
                 window,
                 MAX,
             )
@@ -159,6 +228,7 @@ def reranker_factory(
                 q_embed_dir,
                 d_embed_dir,
                 doc_len_ave,
+                top_k,
                 window,
                 MAX,
             )
@@ -175,6 +245,7 @@ def reranker_factory(
                 q_embed_dir,
                 d_embed_dir,
                 doc_len_ave,
+                top_k,
                 window,
                 bm25_k1,
                 bm25_b,
@@ -189,6 +260,7 @@ def reranker_factory(
                 q_embed_dir,
                 d_embed_dir,
                 doc_len_ave,
+                top_k,
                 window,
                 bm25_k1,
                 bm25_b,
@@ -203,6 +275,7 @@ def reranker_factory(
                 q_embed_dir,
                 d_embed_dir,
                 doc_len_ave,
+                top_k,
                 window,
                 bm25_k1,
                 bm25_b,
@@ -217,6 +290,7 @@ def reranker_factory(
                 q_embed_dir,
                 d_embed_dir,
                 doc_len_ave,
+                top_k,
                 window,
                 bm25_k1,
                 bm25_b,
@@ -231,6 +305,7 @@ def reranker_factory(
                 q_embed_dir,
                 d_embed_dir,
                 doc_len_ave,
+                top_k,
                 window,
                 bm25_k1,
                 bm25_b,
@@ -240,40 +315,103 @@ def reranker_factory(
         # coil
         if pooler == LOCAL_AVE:
             reranker = LOCAL_AVE_MAX_SOFT_TF_DOT(
-                idf, use_idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window
+                idf,
+                use_idf,
+                tokenizer,
+                retrieval_rank,
+                retrieval_score,
+                q_embed_dir,
+                d_embed_dir,
+                doc_len_ave,
+                top_k,
+                window,
             )
         elif pooler == TOKEN:
             reranker = TOKEN_MAX_SOFT_TF_DOT(
-                idf, use_idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window
+                idf,
+                use_idf,
+                tokenizer,
+                retrieval_rank,
+                retrieval_score,
+                q_embed_dir,
+                d_embed_dir,
+                doc_len_ave,
+                top_k,
+                window,
             )
 
     elif func_mode == MAX_SOFT_COS:
         # coil-cos
         if pooler == LOCAL_AVE:
             reranker = LOCAL_AVE_MAX_SOFT_TF_COS(
-                idf, use_idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window
+                idf,
+                use_idf,
+                tokenizer,
+                retrieval_rank,
+                retrieval_score,
+                q_embed_dir,
+                d_embed_dir,
+                doc_len_ave,
+                top_k,
+                window,
             )
         elif pooler == TOKEN:
             reranker = TOKEN_MAX_SOFT_TF_COS(
-                idf, use_idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window
+                idf,
+                use_idf,
+                tokenizer,
+                retrieval_rank,
+                retrieval_score,
+                q_embed_dir,
+                d_embed_dir,
+                doc_len_ave,
+                top_k,
+                window,
             )
 
     elif func_mode == T2T_DOT_MAX:
         # colbert
         reranker = T2T_DOT_RERANKER(
-            idf, use_idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window
+            idf,
+            use_idf,
+            tokenizer,
+            retrieval_rank,
+            retrieval_score,
+            q_embed_dir,
+            d_embed_dir,
+            doc_len_ave,
+            top_k,
+            window,
         )
 
     elif func_mode == T2T_COS_MAX:
         # colbert-cos
         reranker = T2T_COS_RERANKER(
-            idf, use_idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window
+            idf,
+            use_idf,
+            tokenizer,
+            retrieval_rank,
+            retrieval_score,
+            q_embed_dir,
+            d_embed_dir,
+            doc_len_ave,
+            top_k,
+            window,
         )
 
     elif func_mode == NWT:
         # NWT
         reranker = NWT_RERANKER(
-            idf, use_idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window
+            idf,
+            use_idf,
+            tokenizer,
+            retrieval_rank,
+            retrieval_score,
+            q_embed_dir,
+            d_embed_dir,
+            doc_len_ave,
+            top_k,
+            window,
         )
 
     return reranker
@@ -281,7 +419,17 @@ def reranker_factory(
 
 class BERT_REP_RERANKER:
     def __init__(
-        self, idf, use_idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window
+        self,
+        idf,
+        use_idf,
+        tokenizer,
+        retrieval_rank,
+        retrieval_score,
+        q_embed_dir,
+        d_embed_dir,
+        doc_len_ave,
+        top_k,
+        window,
     ):
         self.ret_rank = retrieval_rank
         self.ret_score = retrieval_score
@@ -289,6 +437,7 @@ class BERT_REP_RERANKER:
         self.d_embed_dir = d_embed_dir
         self.idf = idf
         self.use_idf = use_idf
+        self.top_k = top_k
         self.doc_len_ave = doc_len_ave
         self.tokenizer = tokenizer
         self.window = window
@@ -305,7 +454,7 @@ class BERT_REP_RERANKER:
             # q_embed = zarr.convenience.load(str(q_embed_path))[:]
             q_embed = np.load(str(q_embed_path))
             q_rep = self.q_rep_pooler(q_embed, t_query_id)
-            for j, did in enumerate(doc_ids):
+            for j, did in enumerate(doc_ids[: self.top_k]):
                 doc = docs[did]
                 t_doc = self.tokenizer(doc, truncation=True, max_length=TRUNCATE_LENGTH)
                 t_doc_id = t_doc["input_ids"][1:-1]
@@ -317,7 +466,7 @@ class BERT_REP_RERANKER:
                 doc_score = self.score_func(q_rep, d_rep, t_query_id, t_doc_id, t_att_mask, qid, j)
                 all_scores[qid][did] = doc_score
 
-        return doc_score
+        return all_scores
 
     def q_rep_pooler(self, q_embed, t_query_id):
         raise NotImplementedError
@@ -360,7 +509,11 @@ class DENSE_AVE_RERANKER(DENSE_RERANKER):
     def d_rep_pooler(self, d_embed, t_doc_id):
         if self.use_idf:
             d_weight = np.array([self.idf[t] for t in t_doc_id])
-            d_rep = np.average(d_embed[1:-1], axis=0, weights=d_weight)
+            try:
+                d_rep = np.average(d_embed[1:-1], axis=0, weights=d_weight)
+            except ValueError:
+                print(d_weight.shape, d_rep.shape)
+                d_rep = np.average(d_embed[1:-1], axis=0)
         else:
             d_rep = np.average(d_embed[1:-1], axis=0)
         d_rep /= np.linalg.norm(d_rep)
@@ -380,7 +533,11 @@ class DENSE_MAX_RERANKER(DENSE_RERANKER):
     def d_rep_pooler(self, d_embed, t_doc_id):
         if self.use_idf:
             d_weight = np.array([self.idf[t] for t in t_doc_id])
-            d_rep = np.max(d_embed[1:-1] * d_weight, axis=1)
+            try:
+                d_rep = np.max(d_embed[1:-1] * d_weight, axis=1)
+            except ValueError:
+                print(d_weight.shape, d_rep.shape)
+                d_rep = np.max(d_embed[1:-1], axis=1)
         else:
             d_rep = np.max(d_embed[1:-1], axis=1)
         d_rep /= np.linalg.norm(d_rep)
@@ -415,7 +572,12 @@ class AVE_COEF_GLOBAL_RERANKER(COEF_GLOBAL_RERANKER):
     def q_rep_pooler(self, q_embed, t_query_id):
         if self.use_idf:
             q_weight = np.array([self.idf[t] for t in t_query_id])
-            q_rep = np.average(q_embed[1:-1], axis=0, weights=q_weight)
+            try:
+                q_rep = np.average(q_embed[1:-1], axis=0, weights=q_weight)
+            except ValueError:
+                print(q_weight.shape, q_embed[1:-1].shape)
+                print(t_query_id)
+                raise ValueError()
         else:
             q_rep = np.average(q_embed[1:-1], axis=0)
         q_rep /= np.linalg.norm(q_rep)
@@ -424,7 +586,11 @@ class AVE_COEF_GLOBAL_RERANKER(COEF_GLOBAL_RERANKER):
     def d_rep_pooler(self, d_embed, t_doc_id):
         if self.use_idf:
             d_weight = np.array([self.idf[t] for t in t_doc_id])
-            d_rep = np.average(d_embed[1:-1], axis=0, weights=d_weight)
+            try:
+                d_rep = np.average(d_embed[1:-1], axis=0, weights=d_weight)
+            except ValueError:
+                print(d_weight.shape, d_rep.shape)
+                d_rep = np.average(d_embed[1:-1], axis=0)
         else:
             d_rep = np.average(d_embed[1:-1], axis=0)
         d_rep /= np.linalg.norm(d_rep)
@@ -444,7 +610,11 @@ class MAX_COEF_GLOBAL_RERANKER(COEF_GLOBAL_RERANKER):
     def d_rep_pooler(self, d_embed, t_doc_id):
         if self.use_idf:
             d_weight = np.array([self.idf[t] for t in t_doc_id])
-            d_rep = np.max(d_embed[1:-1] * d_weight, axis=1)
+            try:
+                d_rep = np.max(d_embed[1:-1] * d_weight, axis=1)
+            except ValueError:
+                print(d_weight.shape, d_rep.shape)
+                d_rep = np.max(d_embed[1:-1], axis=1)
         else:
             d_rep = np.max(d_embed[1:-1], axis=1)
         d_rep /= np.linalg.norm(d_rep)
@@ -666,7 +836,11 @@ class AVE_SOFT_BM25_RERANKER(GLOBAL_SOFT_BM25_RERANKER):
     def d_rep_pooler(self, d_embed, t_doc_id):
         if self.use_idf:
             d_weight = np.array([self.idf[t] for t in t_doc_id])
-            d_rep = np.average(d_embed[1:-1], axis=0, weights=d_weight)
+            try:
+                d_rep = np.average(d_embed[1:-1], axis=0, weights=d_weight)
+            except ValueError:
+                print(d_weight.shape, d_rep.shape)
+                d_rep = np.average(d_embed[1:-1], axis=0)
         else:
             d_rep = np.average(d_embed[1:-1], axis=0)
         d_rep /= np.linalg.norm(d_rep)
@@ -682,6 +856,19 @@ class MAX_SOFT_BM25_RERANKER(GLOBAL_SOFT_BM25_RERANKER):
             q_rep = np.max(q_embed[1:-1], axis=1)
         q_rep /= np.linalg.norm(q_rep)
         return q_rep
+
+    def d_rep_pooler(self, d_embed, t_doc_id):
+        if self.use_idf:
+            d_weight = np.array([self.idf[t] for t in t_doc_id])
+            try:
+                d_rep = np.max(d_embed[1:-1] * d_weight, axis=1)
+            except ValueError:
+                print(d_weight.shape, d_rep.shape)
+                d_rep = np.max(d_embed[1:-1], axis=1)
+        else:
+            d_rep = np.max(d_embed[1:-1], axis=1)
+        d_rep /= np.linalg.norm(d_rep)
+        return d_rep
 
 
 class MAX_SOFT_TF(BERT_REP_RERANKER):

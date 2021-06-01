@@ -7,7 +7,7 @@ import numpy as np
 import core_rep_rerank
 from load_bert_model import load_tokenizer
 from load_data import load_doc, load_query, load_retreival_result, load_stats
-from file_path_setteing import DOC, QUERY, DF, DOC_LEN, RERANK_SCORE
+from file_path_setteing import DOC, QUERY, DF, DOC_LEN, RERANK_SCORE, STATS
 
 
 def main(args):
@@ -18,8 +18,8 @@ def main(args):
     embed_dir = Path(args.embed_dir)
     q_embed_dir = embed_dir / QUERY
     d_embed_dir = embed_dir / DOC
-    df_path = embed_dir / DF
-    doc_len_path = embed_dir / DOC_LEN
+    df_path = embed_dir / STATS / DF
+    doc_len_path = embed_dir / STATS / DOC_LEN
     func_mode = args.func_mode
     pooler = args.pooler
     use_idf = args.use_idf
@@ -58,9 +58,10 @@ def main(args):
         q_embed_dir,
         d_embed_dir,
         doc_len_ave,
-        window=5,
-        bm25_k1=0.82,
-        bm25_b=0.68,
+        top_k=args.top_k,
+        window=args.window,
+        bm25_k1=args.bm25_k1,
+        bm25_b=args.bm25_b,
     )
 
     scores = reranker.rerank(queries, docs)
@@ -81,7 +82,11 @@ if __name__ == "__main__":
     parser.add_argument("-p", dest="pooler")
     parser.add_argument("-pm", dest="pretrain_model")
     parser.add_argument("-rp", dest="first_rank_path")
-    parser.add_argument("--use_idf", action="store_true")
+    parser.add_argument("--use_idf", type=bool)
+    parser.add_argument("--window", dtype=int, default=5)
+    parser.add_argument("--top_k", dtype=int, default=1000)
+    parser.add_argument("--bm25_k1", dtype=float, default=0.82)
+    parser.add_argument("--bm25_b", dtype=float, default=0.68)
 
     args = parser.parse_args()
 
