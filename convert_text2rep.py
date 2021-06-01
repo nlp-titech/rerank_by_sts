@@ -39,9 +39,9 @@ def encode_and_save_batch(output_dir, model, t_batch_doc, max_doc_length, att_ma
             embeds = model(**t_batch_doc)["last_hidden_state"].cpu().numpy()
 
     for did, embed, t_att in zip(batch_doc_did, embeds, att_masks):
-        out_file = output_dir / f"{did}.npy"
+        out_file = output_dir / f"{did}.npz"
         # zarr.convenience.save(str(out_file), embed[t_att == 1, :])
-        np.save(out_file, embed[t_att == 1, :])
+        np.savez(out_file, embed[t_att == 1, :])
 
 
 def encode_and_save(output_dir, docs, batch_size, tokenizer, model, device):
