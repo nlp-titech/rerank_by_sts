@@ -85,10 +85,10 @@ if __name__ == "__main__":
     parser.add_argument("-pm", dest="pretrain_model")
     parser.add_argument("-rp", dest="first_rank_path")
     parser.add_argument("--use_idf", type=bool)
-    parser.add_argument("--window", dtype=int, default=5)
-    parser.add_argument("--top_k", dtype=int, default=1000)
-    parser.add_argument("--bm25_k1", dtype=float, default=0.82)
-    parser.add_argument("--bm25_b", dtype=float, default=0.68)
+    parser.add_argument("--window", type=int, default=5)
+    parser.add_argument("--top_k", type=int, default=1000)
+    parser.add_argument("--bm25_k1", type=float, default=0.82)
+    parser.add_argument("--bm25_b", type=float, default=0.68)
 
     args = parser.parse_args()
 
