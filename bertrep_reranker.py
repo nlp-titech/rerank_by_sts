@@ -16,10 +16,11 @@ def main(args):
     output_dir = Path(args.output_dir)
     output_dir.mkdir(exist_ok=True, parents=True)
     embed_dir = Path(args.embed_dir)
+    stats_dir = Path(args.stats_dir)
     q_embed_dir = embed_dir / QUERY
     d_embed_dir = embed_dir / DOC
-    df_path = embed_dir / STATS / DF
-    doc_len_path = embed_dir / STATS / DOC_LEN
+    df_path = stats_dir / STATS / DF
+    doc_len_path = stats_dir / STATS / DOC_LEN
     func_mode = args.func_mode
     pooler = args.pooler
     use_idf = args.use_idf
@@ -78,6 +79,7 @@ if __name__ == "__main__":
     parser.add_argument("-q", dest="query_path")
     parser.add_argument("-o", dest="output_dir")
     parser.add_argument("-ed", dest="embed_dir")
+    parser.add_argument("-sd", dest="stats_dir")
     parser.add_argument("-f", dest="func_mode")
     parser.add_argument("-p", dest="pooler")
     parser.add_argument("-pm", dest="pretrain_model")
