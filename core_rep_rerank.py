@@ -450,18 +450,18 @@ class BERT_REP_RERANKER:
 
             t_query = self.tokenizer(query, truncation=True, max_length=TRUNCATE_LENGTH)
             t_query_id = t_query["input_ids"][1:-1]
-            q_embed_path = self.q_embed_dir / f"{qid}.npy"
+            q_embed_path = self.q_embed_dir / f"{qid}.npz"
             # q_embed = zarr.convenience.load(str(q_embed_path))[:]
-            q_embed = np.load(str(q_embed_path))
+            q_embed = np.load(q_embed_path)
             q_rep = self.q_rep_pooler(q_embed, t_query_id)
             for j, did in enumerate(doc_ids[: self.top_k]):
                 doc = docs[did]
                 t_doc = self.tokenizer(doc, truncation=True, max_length=TRUNCATE_LENGTH)
                 t_doc_id = t_doc["input_ids"][1:-1]
                 t_att_mask = t_doc["attention_mask"][1:-1]
-                d_embed_path = self.d_embed_dir / f"{did}.npy"
+                d_embed_path = self.d_embed_dir / f"{did}.npz"
                 # doc_embed = zarr.convenience.load(str(d_embed_path))[:]
-                doc_embed = np.load(str(d_embed_path))
+                doc_embed = np.load(d_embed_path)
                 d_rep = self.d_rep_pooler(doc_embed, t_doc_id)
                 doc_score = self.score_func(q_rep, d_rep, t_query_id, t_doc_id, t_att_mask, qid, j)
                 all_scores[qid][did] = doc_score

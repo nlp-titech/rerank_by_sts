@@ -1,10 +1,11 @@
-OUTDIR="./test/msmarco-passage/nli_mpnet"
+OUTDIR="./test/msmarco-passage/"
 
 python bertrep_reranker.py \
  -d /home/gaia_data/iida.h/msmarco/passage/collection_and_queries/collection_jsonl/docs \
  -q /home/gaia_data/iida.h/msmarco/passage/collection_and_queries/queries.dev.small.tsv \
  -o ${OUTDIR} \
- -ed ./test/msmarco-passage/nli_mpnet \
+ -ed ./test/msmarco-passage/ \
+ -sd ./test/msmarco-passage/ \
  -f coef_ave \
  -p ave \
  -rp /home/gaia_data/iida.h/msmarco/passage/experiment/bm25/run.msmarco-passage.dev.small.2000.optbm25.wo-sw.score.tsv \
