@@ -1,18 +1,37 @@
-OUTDIR="./test/msmarco-doc/nli_mpnet"
+#!/bin/bash
+
+#$ -l s_gpu=1
+#$ -l h_rt=24:00:00
+#$ -j y
+#$ -cwd
+#$ -m abe
+#$ -M iida.h.ac@m.titech.ac.jp
+
+
+dinput=$1
+qinput=$2
+OUTDIR=$3
+PRETRAIN_MODEL=$4
+BATCH_SIZE=$5
+
+. /etc/profile.d/modules.sh
+module load gcc/8.3.0
+module load python/3.9.2
+module load cuda/11.0.194
+module load openjdk/1.8.0.242
+source ~/env/rerank_sts/bin/activate
+module load intel
+
+echo $dinput
+echo $qinput
+echo $OUTDIR
+echo $PRETRAIN_MODEL
+echo $BATCH_SIZE
 
 
 python convert_text2rep.py \
- -d /home/gaia_data/iida.h/msmarco/document/msmarco-docs-jsonl \
- -q /home/gaia_data/iida.h/msmarco/document/msmarco-test2019-queries.tsv \
+ -d ${dinput} \
+ -q ${qinput} \
  -o ${OUTDIR} \
- -p sbert \
- --batch_size 64
-
-python convert_score2msmarco_format.py -r ${OUTDIR}/rerank_score.json -o ${OUTDIR}/rerank_score_msmarco.tsv
-
-python -m pyserini.eval.convert_msmarco_run_to_trec_run \
- --input ${OUTDIR}/rerank_score_msmarco.tsv  --output ${OUTDIR}/rerank_score_msmarco.trec
-
-${HOME}/work/pyserini/tools/eval/trec_eval.9.0.4/trec_eval -c -m recall.100 -m map -m P.30 -m ndcg_cut.10 -m mrr \
- /home/gaia_data/iida.h/msmarco/document/2019qrels-docs.txt \
- ${OUTDIR}/rerank_score_msmarco.trec > ${OUTDIR}/rerank_trec_eval.txt
+ -p ${PRETRAIN_MODEL} \
+ --batch_size ${BATCH_SIZE}
