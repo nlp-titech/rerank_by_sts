@@ -463,7 +463,7 @@ class BERT_REP_RERANKER:
                 doc_embed = d_embeds[did]
                 d_rep = self.d_rep_pooler(doc_embed, t_doc_id)
                 doc_score = self.score_func(q_rep, d_rep, t_query_id, t_doc_id, t_att_mask, qid, j)
-                all_scores[qid][did] = doc_score
+                all_scores[qid][did] = float(doc_score)
 
         return all_scores
 
