@@ -98,8 +98,9 @@ def encode_and_save_doc(output_dir, batch_size, tokenizer, qid, dids, docs, mode
     np.savez_compressed(outfile, **store_dict)
 
 
-def encode_and_save_retrieval(output_dir, docs, retrieval_result, batch_size, tokenizer, model, device):
-    for qid, dids in tqdm(retrieval_result.items()):
+def encode_and_save_retrieval(output_dir, queries, docs, retrieval_result, batch_size, tokenizer, model, device):
+    for qid in tqdm(queries.keys()):
+        dids = retrieval_result[qid]
         encode_and_save_doc(output_dir, batch_size, tokenizer, qid, dids, docs, model, device)
 
 
