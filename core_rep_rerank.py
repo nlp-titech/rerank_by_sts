@@ -685,10 +685,10 @@ class TOKEN_COEF_POOL_RERANKER(COEF_POOL_RERANKER):
         return d_rep[i]
 
     def q_rep_pooler(self, q_embed):
-        return q_embed
+        return q_embed[1:-1]
 
     def d_rep_pooler(self, d_embed):
-        return d_embed
+        return d_embed[1:-1]
 
 
 class LOCAL_AVE_COEF_POOL_RERANKER(COEF_POOL_RERANKER):
@@ -778,10 +778,10 @@ class TOKEN_SOFT_BM25_RERANKER(LOCAL_SOFT_BM25_RERANKER):
         return d_rep[i]
 
     def q_rep_pooler(self, q_embed, t_query_id):
-        return q_embed
+        return q_embed[1:-1]
 
     def d_rep_pooler(self, d_embed, t_doc_id):
-        return d_embed
+        return d_embed[1:-1]
 
 
 class LOCAL_AVE_SOFT_BM25_RERANKER(LOCAL_SOFT_BM25_RERANKER):
@@ -913,10 +913,10 @@ class TOKEN_MAX_SOFT_TF_COS(MAX_SOFT_TF):
         return d_rep[i] / np.linalg.norm(d_rep[i])
 
     def q_rep_pooler(self, q_embed, t_query_id):
-        return q_embed
+        return q_embed[1:-1]
 
     def d_rep_pooler(self, d_embed, t_doc_id):
-        return d_embed
+        return d_embed[1:-1]
 
 
 class TOKEN_MAX_SOFT_TF_DOT(MAX_SOFT_TF):
@@ -927,10 +927,10 @@ class TOKEN_MAX_SOFT_TF_DOT(MAX_SOFT_TF):
         return d_rep[i]
 
     def q_rep_pooler(self, q_embed, t_query_id):
-        return q_embed
+        return q_embed[1:-1]
 
     def d_rep_pooler(self, d_embed, t_doc_id):
-        return d_embed
+        return d_embed[1:-1]
 
 
 class LOCAL_AVE_MAX_SOFT_TF_COS(MAX_SOFT_TF):
@@ -955,7 +955,7 @@ class LOCAL_AVE_MAX_SOFT_TF_COS(MAX_SOFT_TF):
         return q_rep
 
     def d_rep_pooler(self, d_embed, t_doc_id):
-        return d_embed
+        return d_embedp[1:-1]
 
 
 class LOCAL_AVE_MAX_SOFT_TF_DOT(MAX_SOFT_TF):
@@ -973,7 +973,7 @@ class LOCAL_AVE_MAX_SOFT_TF_DOT(MAX_SOFT_TF):
         return q_rep
 
     def d_rep_pooler(self, d_embed, t_doc_id):
-        return d_embed
+        return d_embed[1:-1]
 
 
 class T2T_RERANKER(BERT_REP_RERANKER):
@@ -992,18 +992,18 @@ class T2T_RERANKER(BERT_REP_RERANKER):
 
 class T2T_DOT_RERANKER(T2T_RERANKER):
     def q_rep_pooler(self, q_embed, t_query_id):
-        return q_embed
+        return q_embed[1:-1]
 
     def d_rep_pooler(self, d_embed, t_doc_id):
-        return d_embed
+        return d_embed[1:-1]
 
 
 class T2T_COS_RERANKER(BERT_REP_RERANKER):
     def q_rep_pooler(self, q_embed, t_query_id):
-        return q_embed / np.linalg.norm(q_embed, axis=1)[:, np.newaxis]
+        return q_embed[1:-1] / np.linalg.norm(q_embed[1:-1], axis=1)[:, np.newaxis]
 
     def d_rep_pooler(self, d_embed, t_doc_id):
-        return d_embed / np.linalg.norm(d_embed, axis=1)[:, np.newaxis]
+        return d_embed[1:-1] / np.linalg.norm(d_embed[1:-1], axis=1)[:, np.newaxis]
 
 
 class NWT_RERANKER(T2T_COS_RERANKER):
