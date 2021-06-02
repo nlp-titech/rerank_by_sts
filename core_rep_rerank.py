@@ -1000,10 +1000,10 @@ class T2T_DOT_RERANKER(T2T_RERANKER):
 
 class T2T_COS_RERANKER(BERT_REP_RERANKER):
     def q_rep_pooler(self, q_embed, t_query_id):
-        return q_embed / np.linalg.norm(q_embed, axis=1)
+        return q_embed / np.linalg.norm(q_embed, axis=1)[:, np.newaxis]
 
     def d_rep_pooler(self, d_embed, t_doc_id):
-        return d_embed / np.linalg.norm(d_embed, axis=1)
+        return d_embed / np.linalg.norm(d_embed, axis=1)[:, np.newaxis]
 
 
 class NWT_RERANKER(T2T_COS_RERANKER):
