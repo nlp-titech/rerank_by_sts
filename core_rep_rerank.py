@@ -720,6 +720,7 @@ class LOCAL_SOFT_BM25_RERANKER(BERT_REP_RERANKER):
     def __init__(
         self,
         idf,
+        use_idf,
         tokenizer,
         retrieval_rank,
         retrieval_score,
@@ -732,7 +733,16 @@ class LOCAL_SOFT_BM25_RERANKER(BERT_REP_RERANKER):
         bm25_b,
     ):
         super().__init__(
-            idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, top_k, window
+            idf,
+            use_idf,
+            tokenizer,
+            retrieval_rank,
+            retrieval_score,
+            q_embed_dir,
+            d_embed_dir,
+            doc_len_ave,
+            top_k,
+            window,
         )
         self.bm25_k1 = bm25_k1
         self.bm25_b = bm25_b
@@ -955,7 +965,7 @@ class LOCAL_AVE_MAX_SOFT_TF_COS(MAX_SOFT_TF):
         return q_rep
 
     def d_rep_pooler(self, d_embed, t_doc_id):
-        return d_embedp[1:-1]
+        return d_embed[1:-1]
 
 
 class LOCAL_AVE_MAX_SOFT_TF_DOT(MAX_SOFT_TF):
@@ -980,10 +990,10 @@ class T2T_RERANKER(BERT_REP_RERANKER):
     def score_func(self, q_rep, d_rep, t_query_id, t_doc_id, t_att_mask, qid, drank):
         sim_mat = np.dot(q_rep, d_rep.T)
         if self.use_idf:
-            weight = 1 / len(t_doc_id) * np.ones(len(t_doc_id))
-        else:
             weight = np.array([self.idf[t] for t, at in zip(t_doc_id, t_att_mask) if at == 1])
             weight /= np.linalg.norm(weight)
+        else:
+            weight = 1 / len(t_doc_id) * np.ones(len(t_doc_id))
         max_score = np.max(sim_mat, axis=0)
         max_score = np.maximum(max_score, np.zeros(max_score.shape[0]))
         score = np.sum(max_score * weight)
@@ -1012,10 +1022,10 @@ class NWT_RERANKER(T2T_COS_RERANKER):
         argmax_sim_mat = np.argmax(sim_mat, axis=0)
         pow_index = np.array([self.idf[t_query_id[i]] for i in argmax_sim_mat])
         if self.use_idf:
-            weight = 1 / len(t_doc_id) * np.ones(len(t_doc_id))
-        else:
             weight = np.array([self.idf[t] for t, at in zip(t_doc_id, t_att_mask) if at == 1])
             weight /= np.linalg.norm(weight)
+        else:
+            weight = 1 / len(t_doc_id) * np.ones(len(t_doc_id))
         max_score = np.max(sim_mat, axis=0)
         max_score = np.maximum(max_score, np.zeros(max_score.shape[0]))
         score = np.sum(np.log(np.power(max_score, pow_index) * weight))
