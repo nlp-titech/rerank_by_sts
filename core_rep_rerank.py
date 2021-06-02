@@ -631,11 +631,21 @@ class COEF_POOL_RERANKER(BERT_REP_RERANKER):
         q_embed_dir,
         d_embed_dir,
         doc_len_ave,
+        top_k,
         window,
         coef_pooler_mode,
     ):
         super.__init__(
-            idf, use_idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window
+            idf,
+            use_idf,
+            tokenizer,
+            retrieval_rank,
+            retrieval_score,
+            q_embed_dir,
+            d_embed_dir,
+            doc_len_ave,
+            top_k,
+            window,
         )
         self.coef_pooler_mode = coef_pooler_mode
 
@@ -716,11 +726,14 @@ class LOCAL_SOFT_BM25_RERANKER(BERT_REP_RERANKER):
         q_embed_dir,
         d_embed_dir,
         doc_len_ave,
+        top_k,
         window,
         bm25_k1,
         bm25_b,
     ):
-        super.__init__(idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, window)
+        super.__init__(
+            idf, tokenizer, retrieval_rank, retrieval_score, q_embed_dir, d_embed_dir, doc_len_ave, top_k, window
+        )
         self.bm25_k1 = bm25_k1
         self.bm25_b = bm25_b
 
