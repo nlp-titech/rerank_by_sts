@@ -139,7 +139,7 @@ def main(args):
     if args.mode in {D_MODE, B_MODE}:
         d_output_dir = output_dir / DOC
         d_output_dir.mkdir(exist_ok=True, parents=True)
-        encode_and_save_retrieval(d_output_dir, docs, retrieval_result, batch_size, tokenizer, model, device)
+        encode_and_save_retrieval(d_output_dir, queries, docs, retrieval_result, batch_size, tokenizer, model, device)
 
 
 if __name__ == "__main__":
