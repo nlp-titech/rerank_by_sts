@@ -511,7 +511,7 @@ class DENSE_AVE_RERANKER(DENSE_RERANKER):
             try:
                 d_rep = np.average(d_embed[1:-1], axis=0, weights=d_weight)
             except ValueError:
-                print(d_weight.shape, d_rep.shape)
+                print(d_weight.shape, d_embed.shape)
                 d_rep = np.average(d_embed[1:-1], axis=0)
         else:
             d_rep = np.average(d_embed[1:-1], axis=0)
@@ -535,7 +535,7 @@ class DENSE_MAX_RERANKER(DENSE_RERANKER):
             try:
                 d_rep = np.max(d_embed[1:-1] * d_weight, axis=1)
             except ValueError:
-                print(d_weight.shape, d_rep.shape)
+                print(d_weight.shape, d_embed.shape)
                 d_rep = np.max(d_embed[1:-1], axis=1)
         else:
             d_rep = np.max(d_embed[1:-1], axis=1)
@@ -588,7 +588,7 @@ class AVE_COEF_GLOBAL_RERANKER(COEF_GLOBAL_RERANKER):
             try:
                 d_rep = np.average(d_embed[1:-1], axis=0, weights=d_weight)
             except ValueError:
-                print(d_weight.shape, d_rep.shape)
+                print(d_weight.shape, d_embed.shape)
                 d_rep = np.average(d_embed[1:-1], axis=0)
         else:
             d_rep = np.average(d_embed[1:-1], axis=0)
@@ -612,7 +612,7 @@ class MAX_COEF_GLOBAL_RERANKER(COEF_GLOBAL_RERANKER):
             try:
                 d_rep = np.max(d_embed[1:-1] * d_weight, axis=1)
             except ValueError:
-                print(d_weight.shape, d_rep.shape)
+                print(d_weight.shape, d_embed.shape)
                 d_rep = np.max(d_embed[1:-1], axis=1)
         else:
             d_rep = np.max(d_embed[1:-1], axis=1)
@@ -851,7 +851,7 @@ class AVE_SOFT_BM25_RERANKER(GLOBAL_SOFT_BM25_RERANKER):
             try:
                 d_rep = np.average(d_embed[1:-1], axis=0, weights=d_weight)
             except ValueError:
-                print(d_weight.shape, d_rep.shape)
+                print(d_weight.shape, d_embed.shape)
                 d_rep = np.average(d_embed[1:-1], axis=0)
         else:
             d_rep = np.average(d_embed[1:-1], axis=0)
@@ -875,7 +875,7 @@ class MAX_SOFT_BM25_RERANKER(GLOBAL_SOFT_BM25_RERANKER):
             try:
                 d_rep = np.max(d_embed[1:-1] * d_weight, axis=1)
             except ValueError:
-                print(d_weight.shape, d_rep.shape)
+                print(d_weight.shape, d_embed.shape)
                 d_rep = np.max(d_embed[1:-1], axis=1)
         else:
             d_rep = np.max(d_embed[1:-1], axis=1)
@@ -978,7 +978,7 @@ class LOCAL_AVE_MAX_SOFT_TF_DOT(MAX_SOFT_TF):
 
 class T2T_RERANKER(BERT_REP_RERANKER):
     def score_func(self, q_rep, d_rep, t_query_id, t_doc_id, t_att_mask, qid, drank):
-        sim_mat = np.dot(q_rep.T, d_rep.T)
+        sim_mat = np.dot(q_rep, d_rep.T)
         if self.use_idf:
             weight = 1 / len(t_doc_id) * np.ones(len(t_doc_id))
         else:
@@ -1008,7 +1008,7 @@ class T2T_COS_RERANKER(BERT_REP_RERANKER):
 
 class NWT_RERANKER(T2T_COS_RERANKER):
     def score_func(self, q_rep, d_rep, t_query_id, t_doc_id, t_att_mask, qid, drank):
-        sim_mat = np.dot(q_rep.T, d_rep.T)
+        sim_mat = np.dot(q_rep, d_rep.T)
         argmax_sim_mat = np.argmax(sim_mat, axis=0)
         pow_index = np.array([self.idf[t_query_id[i]] for i in argmax_sim_mat])
         if self.use_idf:
