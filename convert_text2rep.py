@@ -5,7 +5,7 @@ import numpy as np
 
 from tqdm import tqdm
 
-from load_bert_model import load_model, load_tokenizer
+from load_model import load_model, load_tokenizer, SBERT, MPNET, FAST_TEXT
 from load_data import load_doc, load_query, load_retreival_result
 from file_path_setteing import DOC, QUERY
 
@@ -44,7 +44,7 @@ def encode_and_save_batch(output_dir, model, t_batch_doc, max_doc_length, att_ma
         np.savez(out_file, embed[t_att == 1, :])
 
 
-def encode_and_save_query(output_dir, docs, batch_size, tokenizer, model, device):
+def encode_and_save_query_bert(output_dir, docs, batch_size, tokenizer, model, device):
     ids = list(docs.keys())
     for i in tqdm(range(0, len(ids), batch_size)):
         batch_doc_did = ids[i : i + batch_size]
@@ -55,6 +55,16 @@ def encode_and_save_query(output_dir, docs, batch_size, tokenizer, model, device
         att_masks = t_batch_doc["attention_mask"].numpy()
         max_doc_length = t_batch_doc["input_ids"].shape[-1]
         encode_and_save_batch(output_dir, model, t_batch_doc, max_doc_length, att_masks, batch_doc_did, device)
+
+
+def encode_and_save_query_w2v(output_dir, docs, tokenizer, model):
+    dids = list(docs.keys())
+    for did in dids:
+        doc = docs[did]
+        t_doc = tokenizer(doc)
+        embed = np.array([model[t] for t in t_doc])
+        out_file = output_dir / f"{did}.npz"
+        np.savez(out_file, embed)
 
 
 def encode_batch(store_dict, model, t_batch_doc, max_doc_length, att_masks, batch_doc_did, device):
@@ -82,7 +92,7 @@ def encode_batch(store_dict, model, t_batch_doc, max_doc_length, att_masks, batc
         store_dict[did] = embed[t_att == 1, :]
 
 
-def encode_and_save_doc(output_dir, batch_size, tokenizer, qid, dids, docs, model, device):
+def encode_and_save_doc_bert(output_dir, batch_size, tokenizer, qid, dids, docs, model, device):
     store_dict = dict()
     outfile = output_dir / f"{qid}.npz"
     for i in range(0, len(dids), batch_size):
@@ -98,10 +108,25 @@ def encode_and_save_doc(output_dir, batch_size, tokenizer, qid, dids, docs, mode
     np.savez_compressed(outfile, **store_dict)
 
 
-def encode_and_save_retrieval(output_dir, queries, docs, retrieval_result, batch_size, tokenizer, model, device):
+def encode_and_save_doc_w2v(output_dir, tokenizer, qid, dids, docs, model):
+    store_dict = dict()
+    outfile = output_dir / f"{qid}.npz"
+    for did in dids:
+        t_doc = tokenizer(docs[did])
+        store_dict[did] = np.array([model[t] for t in t_doc])
+
+    np.savez_compressed(outfile, **store_dict)
+
+
+def encode_and_save_retrieval(
+    output_dir, queries, docs, retrieval_result, batch_size, tokenizer, model, pretrain_model, device=None
+):
     for qid in tqdm(queries.keys()):
         dids = retrieval_result[qid]
-        encode_and_save_doc(output_dir, batch_size, tokenizer, qid, dids, docs, model, device)
+        if pretrain_model in {SBERT, MPNET}:
+            encode_and_save_doc_bert(output_dir, batch_size, tokenizer, qid, dids, docs, model, device)
+        elif pretrain_model in {FAST_TEXT}:
+            encode_and_save_doc_w2v(output_dir, tokenizer, qid, dids, docs, model)
 
 
 def main(args):
@@ -113,10 +138,15 @@ def main(args):
     pretrain_model = args.pretrain_model
     retrieval_result_path = Path(args.first_rank_path)
 
-    model = load_model(pretrain_model, model_path)
-    tokenizer = load_tokenizer(pretrain_model)
-    device = torch.device("cuda")
-    model.to(device)
+    if pretrain_model in {SBERT, MPNET}:
+        model = load_model(pretrain_model, model_path)
+        tokenizer = load_tokenizer(pretrain_model)
+        device = torch.device("cuda")
+        model.to(device)
+    else:
+        model = load_model(pretrain_model, model_path)
+        tokenizer = load_tokenizer(pretrain_model)
+        device = None
 
     queries = load_query(query_path)
 
@@ -134,12 +164,17 @@ def main(args):
         q_output_dir = output_dir / QUERY
         q_output_dir.mkdir(exist_ok=True, parents=True)
 
-        encode_and_save_query(q_output_dir, queries, batch_size, tokenizer, model, device)
+        if pretrain_model in {SBERT, MPNET}:
+            encode_and_save_query_bert(q_output_dir, queries, batch_size, tokenizer, model, device)
+        elif pretrain_model in {FAST_TEXT}:
+            encode_and_save_query_w2v(q_output_dir, queries, tokenizer, model)
 
     if args.mode in {D_MODE, B_MODE}:
         d_output_dir = output_dir / DOC
         d_output_dir.mkdir(exist_ok=True, parents=True)
-        encode_and_save_retrieval(d_output_dir, queries, docs, retrieval_result, batch_size, tokenizer, model, device)
+        encode_and_save_retrieval(
+            d_output_dir, queries, docs, retrieval_result, batch_size, tokenizer, model, pretrain_model, device
+        )
 
 
 if __name__ == "__main__":

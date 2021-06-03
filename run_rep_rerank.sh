@@ -1,16 +1,16 @@
-OUTDIR="./test/msmarco-passage/"
+OUTDIR="./test/msmarco-passage/nli_mpnet/compress"
 
 python bertrep_reranker.py \
  -d /home/gaia_data/iida.h/msmarco/passage/collection_and_queries/collection_jsonl/docs \
  -q /home/gaia_data/iida.h/msmarco/passage/collection_and_queries/queries.dev.small.tsv \
  -o ${OUTDIR} \
- -ed ./test/msmarco-passage/ \
+ -ed ./test/msmarco-passage/nli_mpnet/compress \
  -sd ./test/msmarco-passage/ \
  -f coef_ave \
  -p ave \
  -rp /home/gaia_data/iida.h/msmarco/passage/experiment/bm25/run.msmarco-passage.dev.small.2000.optbm25.wo-sw.score.tsv \
  -pm sbert \
- --use_idf 0 \
+ --use_idf 1 \
 
 python convert_score2msmarco_format.py -r ${OUTDIR}/rerank_score.json -o ${OUTDIR}/rerank_score_msmarco.tsv
 
