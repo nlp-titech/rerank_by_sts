@@ -27,8 +27,8 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument_group("-i", dest="indir")
-    parser.add_argument_group("-o", dest="out_file")
+    parser.add_argument("-i", dest="indir")
+    parser.add_argument("-o", dest="out_file")
 
     args = parser.parse_args()
 
