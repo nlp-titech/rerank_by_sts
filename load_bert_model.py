@@ -21,7 +21,7 @@ def load_tokenizer(pretrain_model_type):
         # tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/paraphrase-MiniLM-L12-v2")
         tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/nli-mpnet-base-v2")
     elif pretrain_model_type.lower() == MPNET:
-        tokenizer = AutoModel.from_pretrained("microsoft/mpnet-base")
+        tokenizer = AutoTokenizer.from_pretrained("microsoft/mpnet-base")
     else:
         raise ValueError(f"{pretrain_model_type} doesn't exeit")
 
