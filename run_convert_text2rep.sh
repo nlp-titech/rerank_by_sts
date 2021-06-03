@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #$ -l s_gpu=1
-#$ -l h_rt=24:00:00
+#$ -l h_rt=4:00:00
 #$ -j y
 #$ -cwd
 #$ -m abe
@@ -11,7 +11,8 @@ dinput=$1
 qinput=$2
 OUTDIR=$3
 PRETRAIN_MODEL=$4
-BATCH_SIZE=$5
+RETRIEVAL_PATH=$5
+BATCH_SIZE=$6
 
 . /etc/profile.d/modules.sh
 module load gcc/8.3.0
@@ -33,4 +34,5 @@ python convert_text2rep.py \
  -q ${qinput} \
  -o ${OUTDIR} \
  -p ${PRETRAIN_MODEL} \
+ -rp ${RETRIEVAL_PATH} \
  --batch_size ${BATCH_SIZE}
