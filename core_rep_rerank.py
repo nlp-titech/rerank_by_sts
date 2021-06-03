@@ -523,7 +523,7 @@ class DENSE_MAX_RERANKER(DENSE_RERANKER):
     def q_rep_pooler(self, q_embed, t_query_id):
         if self.use_idf:
             q_weight = np.array([self.idf[t] for t in t_query_id])
-            q_rep = np.max(q_embed[1:-1] * q_weight[:, np.newaxis], axis=1)
+            q_rep = np.max(q_embed[1:-1] * q_weight[:, np.newaxis], axis=0)
         else:
             q_rep = np.max(q_embed[1:-1], axis=0)
         q_rep /= np.linalg.norm(q_rep)
@@ -533,7 +533,7 @@ class DENSE_MAX_RERANKER(DENSE_RERANKER):
         if self.use_idf:
             d_weight = np.array([self.idf[t] for t in t_doc_id])
             try:
-                d_rep = np.max(d_embed[1:-1] * d_weight[:, np.newaxis], axis=1)
+                d_rep = np.max(d_embed[1:-1] * d_weight[:, np.newaxis], axis=0)
             except ValueError:
                 print(d_weight.shape, d_embed.shape)
                 d_rep = np.max(d_embed[1:-1], axis=0)
@@ -610,7 +610,7 @@ class MAX_COEF_GLOBAL_RERANKER(COEF_GLOBAL_RERANKER):
         if self.use_idf:
             d_weight = np.array([self.idf[t] for t in t_doc_id])
             try:
-                d_rep = np.max(d_embed[1:-1] * d_weight[:, np.newaxis], axis=1)
+                d_rep = np.max(d_embed[1:-1] * d_weight[:, np.newaxis], axis=00)
             except ValueError:
                 print(d_weight.shape, d_embed.shape)
                 d_rep = np.max(d_embed[1:-1], axis=0)
@@ -1008,7 +1008,7 @@ class T2T_DOT_RERANKER(T2T_RERANKER):
         return d_embed[1:-1]
 
 
-class T2T_COS_RERANKER(BERT_REP_RERANKER):
+class T2T_COS_RERANKER(T2T_RERANKER):
     def q_rep_pooler(self, q_embed, t_query_id):
         return q_embed[1:-1] / np.linalg.norm(q_embed[1:-1], axis=1)[:, np.newaxis]
 

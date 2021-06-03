@@ -23,7 +23,8 @@ def main(args):
     doc_len_path = stats_dir / STATS / DOC_LEN
     func_mode = args.func_mode
     pooler = args.pooler
-    use_idf = args.use_idf
+    use_idf = bool(args.use_idf)
+    print(use_idf)
     retrieval_result_path = Path(args.first_rank_path)
 
     tokenizer = load_tokenizer(args.pretrain_model)
@@ -84,7 +85,7 @@ if __name__ == "__main__":
     parser.add_argument("-p", dest="pooler")
     parser.add_argument("-pm", dest="pretrain_model")
     parser.add_argument("-rp", dest="first_rank_path")
-    parser.add_argument("--use_idf", type=bool)
+    parser.add_argument("--use_idf", type=int)
     parser.add_argument("--window", type=int, default=5)
     parser.add_argument("--top_k", type=int, default=1000)
     parser.add_argument("--bm25_k1", type=float, default=0.82)
