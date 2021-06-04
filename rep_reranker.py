@@ -68,7 +68,7 @@ def main(args):
             bm25_b=args.bm25_b,
         )
     elif args.pretrain_model in {FAST_TEXT}:
-        reranker = core_rep_w2v_rerank.reranker_fastory(
+        reranker = core_rep_w2v_rerank.reranker_factory(
             func_mode,
             pooler,
             idf,
