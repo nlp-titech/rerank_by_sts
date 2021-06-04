@@ -5,30 +5,44 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from load_bert_model import load_tokenizer
+from load_model import load_tokenizer, SBERT, MPNET, FAST_TEXT
 from file_path_setteing import DF, DOC_LEN, STATS
 
 
-def doc_stats(input_doc_path, tokenizer):
-    def doc_len_and_df(input_file, df, doc_lens):
+def doc_stats(input_doc_path, tokenizer, pretrain_model):
+    def doc_len_and_df_bert(input_file, df, doc_lens):
         with input_file.open(mode="r") as f:
             for i, line in tqdm(enumerate(f)):
                 jline = json.loads(line)
                 text = jline["contents"]
                 t_doc = tokenizer(text)
-                doc_lens.append(len(text.split()))
+                doc_lens.append(len(t_doc["input_ids"]))
                 df.update(set(t_doc["input_ids"]))
+
+    def doc_len_and_df_w2v(input_file, df, doc_lens):
+        with input_file.open(mode="r") as f:
+            for i, line in tqdm(enumerate(f)):
+                jline = json.loads(line)
+                text = jline["contents"]
+                t_doc = tokenizer(text)
+                doc_lens.append(len(t_doc))
+                df.update(set(t_doc))
 
     doc_lens = list()
     df = Counter()
 
+    if pretrain_model in {SBERT, MPNET}:
+        take_stats = doc_len_and_df_bert
+    else:
+        take_stats = doc_len_and_df_w2v
+
     if input_doc_path.is_dir():
         input_doc_files = sorted(input_doc_path.glob("*.json"))
         for input_doc_file in input_doc_files:
-            doc_len_and_df(input_doc_file, df, doc_lens)
+            take_stats(input_doc_file, df, doc_lens)
 
     else:
-        doc_len_and_df(input_doc_path, df, doc_lens)
+        take_stats(input_doc_path, df, doc_lens)
 
     return df, doc_lens
 
@@ -41,7 +55,7 @@ def main(args):
     pretrain_model = args.pretrain_model
 
     tokenizer = load_tokenizer(pretrain_model)
-    df, doc_lens = doc_stats(input_doc_path, tokenizer)
+    df, doc_lens = doc_stats(input_doc_path, tokenizer, pretrain_model)
 
     df_path = output_dir / DF
     doc_lens_path = output_dir / DOC_LEN
