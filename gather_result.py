@@ -10,18 +10,18 @@ def main(args):
     all_params = []
     out_df = pd.DataFrame()
     for rf in result_files:
-        params = rf.parts[len(p_indir) :]
+        params = rf.parts[len(p_indir): -1]
         result = dict()
         with rf.open() as f:
             for line in f:
-                k, v = line.split()
+                k, _, v = line.split()
                 result[k] = v
 
         out_df = pd.concat((out_df, pd.Series(result)), axis=1)
-        all_params.append(params)
+        all_params.append("_".join(params))
 
     out_df.columns = all_params
-    out_df.to_csv(args.out_file)
+    out_df.T.to_csv(args.out_file)
 
 
 if __name__ == "__main__":

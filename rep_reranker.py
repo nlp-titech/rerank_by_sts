@@ -4,8 +4,9 @@ from pathlib import Path
 
 import numpy as np
 
-import core_rep_rerank
-from load_bert_model import load_tokenizer
+import core_rep_bert_rerank
+import core_rep_w2v_rerank
+from load_model import load_tokenizer, SBERT, MPNET, FAST_TEXT
 from load_data import load_doc, load_query, load_retreival_result, load_stats
 from file_path_setteing import DOC, QUERY, DF, DOC_LEN, RERANK_SCORE, STATS
 
@@ -46,25 +47,43 @@ def main(args):
     for k, v in df.items():
         idf[k] = np.log(doc_num / (v + 1))
 
-    idf = core_rep_rerank.min_dict(idf)
+    idf = core_rep_bert_rerank.min_dict(idf)
     doc_len_ave = np.mean(doc_len)
 
-    reranker = core_rep_rerank.reranker_factory(
-        func_mode,
-        pooler,
-        idf,
-        use_idf,
-        tokenizer,
-        retrieval_rank,
-        retrieval_score,
-        q_embed_dir,
-        d_embed_dir,
-        doc_len_ave,
-        top_k=args.top_k,
-        window=args.window,
-        bm25_k1=args.bm25_k1,
-        bm25_b=args.bm25_b,
-    )
+    if args.pretrain_model in {SBERT, MPNET}:
+        reranker = core_rep_bert_rerank.reranker_factory(
+            func_mode,
+            pooler,
+            idf,
+            use_idf,
+            tokenizer,
+            retrieval_rank,
+            retrieval_score,
+            q_embed_dir,
+            d_embed_dir,
+            doc_len_ave,
+            top_k=args.top_k,
+            window=args.window,
+            bm25_k1=args.bm25_k1,
+            bm25_b=args.bm25_b,
+        )
+    elif args.pretrain_model in {FAST_TEXT}:
+        reranker = core_rep_w2v_rerank.reranker_fastory(
+            func_mode,
+            pooler,
+            idf,
+            use_idf,
+            tokenizer,
+            retrieval_rank,
+            retrieval_score,
+            q_embed_dir,
+            d_embed_dir,
+            doc_len_ave,
+            top_k=args.top_k,
+            window=args.window,
+            bm25_k1=args.bm25_k1,
+            bm25_b=args.bm25_b,
+        )
 
     scores = reranker.rerank(queries, docs)
 

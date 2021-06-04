@@ -35,4 +35,5 @@ python convert_text2rep.py \
  -o ${OUTDIR} \
  -p ${PRETRAIN_MODEL} \
  -rp ${RETRIEVAL_PATH} \
+ -m /home/gaia_data/iida.h/msmarco/passage/trained_model/fast-text_msmarco-finetune.bin \
  --batch_size ${BATCH_SIZE}
