@@ -681,7 +681,7 @@ class LOCAL_SOFT_BM25_RERANKER(W2V_REP_RERANKER):
         soft_tf = defaultdict(float)
         doc_len = len(t_doc)
         for i, tq in enumerate(t_query):
-            indexes = [j for j, (td, am) in enumerate(t_doc) if tq == td]
+            indexes = [j for j, td in enumerate(t_doc) if tq == td]
 
             for k in indexes:
                 local_q_rep = self.local_q_rep_pooler(q_rep, i)
