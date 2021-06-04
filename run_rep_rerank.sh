@@ -1,6 +1,6 @@
-OUTDIR="./test/msmarco-passage/nli_mpnet/compress"
+OUTDIR="./test/msmarco-passage/fast_text"
 
-python bertrep_reranker.py \
+python rep_reranker.py \
  -d /home/gaia_data/iida.h/msmarco/passage/collection_and_queries/collection_jsonl/docs \
  -q /home/gaia_data/iida.h/msmarco/passage/collection_and_queries/queries.dev.small.tsv \
  -o ${OUTDIR} \

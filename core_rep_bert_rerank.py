@@ -768,7 +768,7 @@ class LOCAL_SOFT_BM25_RERANKER(BERT_REP_RERANKER):
                 local_q_rep = self.local_q_rep_pooler(q_rep, i)
                 local_d_rep = self.local_d_rep_pooler(d_rep, k)
                 score = np.dot(local_q_rep, local_d_rep)
-                soft_tf[tq] += score
+                soft_tf[tq] += np.maximum(score, 0.0)
 
         doc_score = self.calc_bm25_each_token(soft_tf, doc_len)
         return doc_score
@@ -908,9 +908,9 @@ class MAX_SOFT_TF(BERT_REP_RERANKER):
         score = 0.0
         for v, tf_scores in soft_tf.items():
             if self.use_idf:
-                score += np.max(tf_scores) * self.idf[v]
+                score += np.maximum(np.max(tf_scores), 0.0) * self.idf[v]
             else:
-                score += np.max(tf_scores)
+                score += np.maximum(np.max(tf_scores), 0.0)
 
         return score
 
