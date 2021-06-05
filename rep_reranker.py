@@ -43,9 +43,10 @@ def main(args):
 
     idf = dict()
     doc_num = len(docs)
+    print("doc_num: ", doc_num)
 
     for k, v in df.items():
-        idf[k] = np.log(doc_num / (v + 1))
+        idf[k] = np.log(doc_num / v)
 
     idf = core_rep_bert_rerank.min_dict(idf)
     doc_len_ave = np.mean(doc_len)

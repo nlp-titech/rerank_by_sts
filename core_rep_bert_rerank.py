@@ -25,13 +25,16 @@ LOCAL_AVE = "local_ave"
 class min_dict(dict):
     def __init__(self, data):
         self.data = data
-        self.min = min(data.values())
+        self.min_v = min(data.values())
+
+    def __str__(self):
+        return str(self.data)
 
     def __getitem__(self, k):
         if k in self.data:
             return self.data[k]
         else:
-            return self.min
+            return self.min_v
 
 
 def reranker_factory(
@@ -449,7 +452,7 @@ class BERT_REP_RERANKER:
             doc_ids = self.ret_rank[qid]
 
             t_query = self.tokenizer(query, truncation=True, max_length=TRUNCATE_LENGTH)
-            t_query_id = t_query["input_ids"][1:-1]
+            t_query_id = [str(s) for s in t_query["input_ids"][1:-1]]
             q_embed_path = self.q_embed_dir / f"{qid}.npz"
             # q_embed = zarr.convenience.load(str(q_embed_path))[:]
             q_embed = np.load(q_embed_path)["arr_0"]
@@ -458,7 +461,7 @@ class BERT_REP_RERANKER:
             for j, did in enumerate(doc_ids[: self.top_k]):
                 doc = docs[did]
                 t_doc = self.tokenizer(doc, truncation=True, max_length=TRUNCATE_LENGTH)
-                t_doc_id = t_doc["input_ids"][1:-1]
+                t_doc_id = [str(s) for s in t_doc["input_ids"][1:-1]]
                 t_att_mask = t_doc["attention_mask"][1:-1]
                 doc_embed = d_embeds[did]
                 d_rep = self.d_rep_pooler(doc_embed, t_doc_id)
