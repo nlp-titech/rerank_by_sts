@@ -22,18 +22,6 @@ TOKEN = "token"
 LOCAL_AVE = "local_ave"
 
 
-class min_dict(dict):
-    def __init__(self, data):
-        self.data = data
-        self.min = min(data.values())
-
-    def __getitem__(self, k):
-        if k in self.data:
-            return self.data[k]
-        else:
-            return self.min
-
-
 def reranker_factory(
     func_mode,
     pooler,
@@ -394,7 +382,7 @@ class W2V_REP_RERANKER:
             all_scores[str(qid)] = dict()
             doc_ids = self.ret_rank[qid]
 
-            t_query = self.tokenizer(query)
+            t_query = [str(s) for s in self.tokenizer(query)]
             q_embed_path = self.q_embed_dir / f"{qid}.npz"
             # q_embed = zarr.convenience.load(str(q_embed_path))[:]
             q_embed = np.load(q_embed_path)["arr_0"]
@@ -402,7 +390,7 @@ class W2V_REP_RERANKER:
             d_embeds = np.load(self.d_embed_dir / f"{qid}.npz")
             for j, did in enumerate(doc_ids[: self.top_k]):
                 doc = docs[did]
-                t_doc = self.tokenizer(doc)
+                t_doc = [str(s) for s in self.tokenizer(doc)]
                 doc_embed = d_embeds[did]
                 d_rep = self.d_rep_pooler(doc_embed, t_doc)
                 doc_score = self.score_func(q_rep, d_rep, t_query, t_doc, qid, j)
@@ -701,10 +689,10 @@ class LOCAL_SOFT_BM25_RERANKER(W2V_REP_RERANKER):
 
 class TOKEN_SOFT_BM25_RERANKER(LOCAL_SOFT_BM25_RERANKER):
     def local_q_rep_pooler(self, q_rep, i):
-        return q_rep[i]
+        return q_rep[i] / np.linalg.norm(q_rep[i])
 
     def local_d_rep_pooler(self, d_rep, i):
-        return d_rep[i]
+        return d_rep[i] / np.linalg.norm(d_rep[i])
 
     def q_rep_pooler(self, q_embed, t_query):
         return q_embed
@@ -720,14 +708,14 @@ class LOCAL_AVE_SOFT_BM25_RERANKER(LOCAL_SOFT_BM25_RERANKER):
     def local_d_rep_pooler(self, d_rep, i):
         d_start = i - self.window if i - self.window > 0 else 0
         d_end = i + self.window
-        d_embed = np.mean(d_rep[d_start:d_end], axis=0)
-        d_norm = np.linalg.norm(d_embed)
-        if d_norm < 1e-08:
-            d_embed = np.zeros(d_embed.shape[0])
+        l_d_rep = np.mean(d_rep[d_start:d_end], axis=0)
+        l_d_norm = np.linalg.norm(l_d_rep)
+        if l_d_norm < 1e-08:
+            l_d_rep = np.zeros(l_d_rep.shape[0])
         else:
-            d_embed /= d_norm
+            l_d_rep /= l_d_norm
 
-        return d_rep[i]
+        return l_d_rep
 
     def q_rep_pooler(self, q_embed, t_query):
         q_rep = np.mean(q_embed, axis=0)
@@ -815,7 +803,7 @@ class MAX_SOFT_TF(W2V_REP_RERANKER):
         score = 0.0
         for v, tf_scores in soft_tf.items():
             if self.use_idf:
-                score += np.maximmum(np.max(tf_scores), 0.0) * self.idf[v]
+                score += np.maximum(np.max(tf_scores), 0.0) * self.idf[v]
             else:
                 score += np.maximum(np.max(tf_scores), 0.0)
 
