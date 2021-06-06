@@ -45,8 +45,14 @@ def main(args):
     doc_num = len(docs)
     print("doc_num: ", doc_num)
 
-    for k, v in df.items():
-        idf[k] = np.log(doc_num / v)
+    if func_mode in {core_rep_bert_rerank.NWT, core_rep_bert_rerank.APPROX_NWT}:
+        for k, v in df.items():
+            idf[k] = np.log((doc_num - v + 0.5) / (v + 0.5))
+            if idf[k] < 0.0 or np.isnan(idf[k]):
+                idf[k] = 0.0
+    else:
+        for k, v in df.items():
+            idf[k] = np.log(doc_num / v)
 
     idf = core_rep_bert_rerank.OOV1_dict(idf)
     doc_len_ave = np.mean(doc_len)

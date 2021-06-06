@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 import numpy as np
+import cvxpy as cp
 from tqdm import tqdm
 from convert_text2rep import TRUNCATE_LENGTH
 
@@ -14,6 +15,7 @@ MAX_SOFT_COS = "max_soft_cos"
 T2T_DOT_MAX = "t2t_dot"
 T2T_COS_MAX = "t2t_cos"
 NWT = "nwt"
+APPROX_NWT = "approx_nwt"
 
 CLS = "cls"
 AVE = "ave"
@@ -404,6 +406,21 @@ def reranker_factory(
     elif func_mode == NWT:
         # NWT
         reranker = NWT_RERANKER(
+            idf,
+            use_idf,
+            tokenizer,
+            retrieval_rank,
+            retrieval_score,
+            q_embed_dir,
+            d_embed_dir,
+            doc_len_ave,
+            top_k,
+            window,
+        )
+
+    elif func_mode == APPROX_NWT:
+        # NWT
+        reranker = APPROX_NWT_RERANKER(
             idf,
             use_idf,
             tokenizer,
@@ -1021,6 +1038,25 @@ class T2T_COS_RERANKER(T2T_RERANKER):
 class NWT_RERANKER(T2T_COS_RERANKER):
     def score_func(self, q_rep, d_rep, t_query_id, t_doc_id, t_att_mask, qid, drank):
         sim_mat = np.dot(q_rep, d_rep.T)
+        pow_index = np.tile(np.array([self.idf[tq] for tq in t_query_id]), (len(d_rep), 1)).T
+        path_score = np.power(sim_mat, pow_index)
+        weight = cp.Variable(sim_mat.shape)
+        objective = cp.Maximize(cp.sum(cp.log(cp.sum(weight * path_score, axis=1))))
+        if self.use_idf:
+            weight_constraint = np.array([self.idf[t] for t, at in zip(t_doc_id, t_att_mask) if at == 1])
+            weight_constraint /= np.linalg.norm(weight_constraint)
+        else:
+            weight_constraint = 1 / len(t_doc_id) * np.ones(len(t_doc_id))
+
+        constraints = [np.sum(weight, axis=0) == weight_constraint]
+        prob = cp.Problem(objective, constraints)
+        score = prob.solve()
+        return score
+
+
+class APPROX_NWT_RERANKER(T2T_COS_RERANKER):
+    def score_func(self, q_rep, d_rep, t_query_id, t_doc_id, t_att_mask, qid, drank):
+        sim_mat = np.dot(q_rep, d_rep.T)
         argmax_sim_mat = np.argmax(sim_mat, axis=0)
         pow_index = np.array([self.idf[t_query_id[i]] for i in argmax_sim_mat])
         if self.use_idf:
@@ -1031,9 +1067,14 @@ class NWT_RERANKER(T2T_COS_RERANKER):
         max_score = np.max(sim_mat, axis=0)
         path_cost = np.power(np.maximum(max_score, np.zeros(max_score.shape[0])), pow_index)
         each_q_token_score = path_cost * weight
-        score_per_qtoken = defaultdict(float)
+        score_per_q_token = defaultdict(float)
         for i, s in zip(argmax_sim_mat, each_q_token_score):
             score_per_q_token[i] += s
+
+        score = 0.0
+        for v in score_per_q_token.values():
+            if v > 0.0:
+                score += v
 
         return score
 
