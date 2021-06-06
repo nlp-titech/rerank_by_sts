@@ -22,10 +22,9 @@ TOKEN = "token"
 LOCAL_AVE = "local_ave"
 
 
-class min_dict(dict):
+class OOV1_dict(dict):
     def __init__(self, data):
         self.data = data
-        self.min_v = min(data.values())
 
     def __str__(self):
         return str(self.data)
@@ -34,7 +33,7 @@ class min_dict(dict):
         if k in self.data:
             return self.data[k]
         else:
-            return self.min_v
+            return 1.0
 
 
 def reranker_factory(
@@ -1030,8 +1029,12 @@ class NWT_RERANKER(T2T_COS_RERANKER):
         else:
             weight = 1 / len(t_doc_id) * np.ones(len(t_doc_id))
         max_score = np.max(sim_mat, axis=0)
-        max_score = np.maximum(max_score, np.zeros(max_score.shape[0]))
-        score = np.sum(np.log(np.power(max_score, pow_index) * weight))
+        path_cost = np.power(np.maximum(max_score, np.zeros(max_score.shape[0])), pow_index)
+        each_q_token_score = path_cost * weight
+        score_per_qtoken = defaultdict(float)
+        for i, s in zip(argmax_sim_mat, each_q_token_score):
+            score_per_q_token[i] += s
+
         return score
 
 
