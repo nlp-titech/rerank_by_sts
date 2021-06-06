@@ -48,7 +48,7 @@ def main(args):
     for k, v in df.items():
         idf[k] = np.log(doc_num / v)
 
-    idf = core_rep_bert_rerank.min_dict(idf)
+    idf = core_rep_bert_rerank.OOV1_dict(idf)
     doc_len_ave = np.mean(doc_len)
 
     if args.pretrain_model in {SBERT, MPNET}:
