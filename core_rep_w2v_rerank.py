@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 import numpy as np
+import cvxpy as cp
 from tqdm import tqdm
 from convert_text2rep import TRUNCATE_LENGTH
 
@@ -14,6 +15,7 @@ MAX_SOFT_COS = "max_soft_cos"
 T2T_DOT_MAX = "t2t_dot"
 T2T_COS_MAX = "t2t_cos"
 NWT = "nwt"
+APPROX_NWT = "approx_nwt"
 
 CLS = "cls"
 AVE = "ave"
@@ -347,6 +349,20 @@ def reranker_factory(
             top_k,
             window,
         )
+    elif func_mode == APPROX_NWT:
+        # APPROX_NWT
+        reranker = APPROX_NWT_RERANKER(
+            idf,
+            use_idf,
+            tokenizer,
+            retrieval_rank,
+            retrieval_score,
+            q_embed_dir,
+            d_embed_dir,
+            doc_len_ave,
+            top_k,
+            window,
+        )
 
     return reranker
 
@@ -463,7 +479,7 @@ class DENSE_MAX_RERANKER(DENSE_RERANKER):
 
 
 class COEF_GLOBAL_RERANKER(W2V_REP_RERANKER):
-    def score_func(self, q_rep, d_rep, t_query_id, t_doc_id, t_att_mask, qid, drank):
+    def score_func(self, q_rep, d_rep, t_query_id, t_doc_id, qid, drank):
         coef = np.dot(q_rep, d_rep)
         return (1 + coef) * self.ret_score[qid][drank]
 
@@ -912,8 +928,28 @@ class T2T_COS_RERANKER(T2T_RERANKER):
 
 
 class NWT_RERANKER(T2T_COS_RERANKER):
+    def score_func(self, q_rep, d_rep, t_query_id, t_doc_id, qid, drank):
+        sim_mat = np.maximum(np.dot(q_rep, d_rep.T), 0)
+        pow_index = np.tile(np.array([self.idf[tq] for tq in t_query_id]), (len(d_rep), 1)).T
+        path_score = np.power(sim_mat, pow_index)
+        weight = cp.Variable(sim_mat.shape)
+        objective = cp.Maximize(cp.sum(cp.log(cp.sum(cp.multiply(weight, path_score), axis=1))))
+        if self.use_idf:
+            weight_constraint = np.array([self.idf[t] for t in t_doc_id])
+            weight_constraint /= np.linalg.norm(weight_constraint)
+        else:
+            weight_constraint = 1 / len(t_doc_id) * np.ones(len(t_doc_id))
+
+        # print(sim_mat.shape, pow_index.shape)
+        constraints = [cp.sum(weight, axis=0) == weight_constraint, weight >= 0]
+        prob = cp.Problem(objective, constraints)
+        score = prob.solve(solver=cp.SCS)
+        return score
+
+
+class APPROX_NWT_RERANKER(T2T_COS_RERANKER):
     def score_func(self, q_rep, d_rep, t_query, t_doc, qid, drank):
-        sim_mat = np.dot(q_rep, d_rep.T)
+        sim_mat = np.maximum(np.dot(q_rep, d_rep.T), 0)
         argmax_sim_mat = np.argmax(sim_mat, axis=0)
         pow_index = np.array([self.idf[t_query[i]] for i in argmax_sim_mat])
         if self.use_idf:
@@ -922,98 +958,17 @@ class NWT_RERANKER(T2T_COS_RERANKER):
         else:
             weight = 1 / len(t_doc) * np.ones(len(t_doc))
         max_score = np.max(sim_mat, axis=0)
-        max_score = np.maximum(max_score, np.zeros(max_score.shape[0]))
-        score = np.sum(np.log(np.power(max_score, pow_index) * weight))
+        path_cost = np.power(np.maximum(max_score, np.zeros(max_score.shape[0])), pow_index)
+        each_q_token_score = path_cost * weight
+        score_per_q_token = defaultdict(float)
+        for i, s in zip(argmax_sim_mat, each_q_token_score):
+            score_per_q_token[i] += s
+
+        # print(score_per_q_token)
+
+        score = 0.0
+        for v in score_per_q_token.values():
+            if v > 0.0:
+                score += np.log(v)
+
         return score
-
-
-"""
-ボツ
-class DENSE_QDIDFwAVE_RERANKER(DENSE_RERANKER):
-    def q_rep_pooler(self, q_embed, t_query_id):
-        q_weight = np.array([self.idf[t] for t in t_query_id])
-        q_rep = np.average(q_embed[1:-1], axis=0, weight=q_weight)
-        q_rep /= np.linalg.norm(q_rep)
-        return q_rep
-
-    def d_rep_pooler(self, doc_embed, t_doc_id):
-        d_weight = np.array([self.idf[t] for t in t_doc_id])
-        d_rep = np.average(doc_embed[1:-1], axis=0, weight=d_weight)
-        d_rep /= np.linalg.norm(d_rep)
-        return d_rep
-
-
-class DENSE_QIDFwAVE_RERANKER(DENSE_RERANKER):
-    def q_rep_pooler(self, q_embed, t_query_id):
-        q_weight = np.array([self.idf[t] for t in t_query_id])
-        q_rep = np.average(q_embed[1:-1], axis=0, weight=q_weight)
-        q_rep /= np.linalg.norm(q_rep)
-        return q_rep
-
-    def d_rep_pooler(self, doc_embed, t_doc_id):
-        d_rep = np.mean(doc_embed[1:-1], axis=0)
-        d_rep /= np.linalg.norm(d_rep)
-        return d_rep
-
-
-class DENSE_DIDFwAVE_RERANKER(DENSE_RERANKER):
-    def q_rep_pooler(self, q_embed, t_query_id):
-        q_weight = np.array([self.idf[t] for t in t_query_id])
-        q_rep = np.average(q_embed[1:-1], axis=0, weight=q_weight)
-        q_rep /= np.linalg.norm(q_rep)
-        return q_rep
-
-    def d_rep_pooler(self, doc_embed, t_doc_id):
-        d_rep = np.mean(doc_embed[1:-1], axis=0)
-        d_rep /= np.linalg.norm(d_rep)
-        return d_rep
-
-class T2T_DOTMAX_RERANKER(T2T_DOT_RERANKER):
-    def score_func(self, q_rep, d_rep, t_query_id, t_doc_id, t_att_mask, qid, drank):
-        sim_mat = np.dot(q_rep.T, d_rep.T)
-        score = np.sum(np.max(sim_mat, axis=0))
-        return score
-
-
-class T2T_DOTMAXDIDF_RERANKER(T2T_DOT_RERANKER):
-    def score_func(self, q_rep, d_rep, t_query_id, t_doc_id, t_att_mask, qid, drank):
-        sim_mat = np.dot(q_rep.T, d_rep.T)
-        weight = np.array([self.idf[t] for t in t_doc_id])
-        max_score = np.max(sim_mat, axis=0) * weight
-        score = np.sum(max_score)
-        return score
-
-class T2T_DOTMAXQIDF_RERANKER(T2T_DOT_RERANKER):
-    def score_func(self, q_rep, d_rep, t_query_id, t_doc_id, t_att_mask, qid, drank):
-        sim_mat = np.dot(q_rep.T, d_rep.T)
-        argmax_sim_mat = np.argmax(sim_mat, axis=0)
-        weight = np.array([self.idf[t_query_id[i]] for i in argmax_sim_mat])
-        max_score = np.max(sim_mat, axis=0) * weight
-        score = np.sum(max_score)
-        return score
-
-class T2T_COSMAX_RERANKER(T2T_COS_RERANKER):
-    def score_func(self, q_rep, d_rep, t_query_id, t_doc_id, t_att_mask, qid, drank):
-        sim_mat = np.dot(q_rep.T, d_rep.T)
-        score = np.sum(np.max(sim_mat, axis=0))
-        return score
-
-
-class T2T_COSMAXDIDF_RERANKER(T2T_COS_RERANKER):
-    def score_func(self, q_rep, d_rep, t_query_id, t_doc_id, t_att_mask, qid, drank):
-        sim_mat = np.dot(q_rep.T, d_rep.T)
-        weight = np.array([self.idf[t] for t, at in zip(t_doc_id, t_att_mask) if at == 1])
-        weight /= np.linalg.norm(weight)
-        max_score = np.max(sim_mat, axis=0) * weight
-        score = np.sum(max_score)
-        return score
-
-class T2T_COSMAXQIDF_RERANKER(T2T_COS_RERANKER):
-    def score_func(self, q_rep, d_rep, t_query_id, t_doc_id, t_att_mask, qid, drank):
-        sim_mat = np.dot(q_rep.T, d_rep.T)
-        argmax_sim_mat = np.argmax(sim_mat, axis=0)
-        weight = np.array([self.idf[t_query_id[i]] for i in argmax_sim_mat])
-        max_score = np.max(sim_mat, axis=0) * weight
-        score = np.sum(max_score)
-        return score
-"""
