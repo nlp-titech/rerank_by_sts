@@ -586,10 +586,10 @@ class COEF_POOL_RERANKER(W2V_REP_RERANKER):
 
 class TOKEN_COEF_POOL_RERANKER(COEF_POOL_RERANKER):
     def local_q_rep_pooler(self, q_rep, i):
-        return q_rep[i]
+        return q_rep[i] / np.linalg.norm(q_rep[i])
 
     def local_d_rep_pooler(self, d_rep, i):
-        return d_rep[i]
+        return d_rep[i] / np.linalg.norm(d_rep[i])
 
     def q_rep_pooler(self, q_embed, t_queru):
         return q_embed
@@ -605,14 +605,14 @@ class LOCAL_AVE_COEF_POOL_RERANKER(COEF_POOL_RERANKER):
     def local_d_rep_pooler(self, d_rep, i):
         d_start = i - self.window if i - self.window > 0 else 0
         d_end = i + self.window
-        d_embed = np.mean(d_rep[d_start:d_end], axis=0)
-        d_norm = np.linalg.norm(d_embed)
-        if d_norm < 1e-08:
-            d_embed = np.zeros(d_embed.shape[0])
+        l_d_rep = np.mean(d_rep[d_start:d_end], axis=0)
+        l_d_norm = np.linalg.norm(l_d_rep)
+        if l_d_norm < 1e-08:
+            l_d_rep = np.zeros(l_d_rep.shape[0])
         else:
-            d_embed /= d_norm
+            l_d_rep /= l_d_norm
 
-        return d_rep[i]
+        return l_d_rep
 
     def q_rep_pooler(self, q_embed, t_query):
         q_rep = np.mean(q_embed, axis=0)
