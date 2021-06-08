@@ -26,7 +26,11 @@ def main(args):
 
             dataset_result.append(df)
 
-    outpath = dataset_root / f"{dataset_type}_result.csv"
+    if dataset_type:
+        outpath = dataset_root / f"{dataset_type}_result.csv"
+    else:
+        outpath = dataset_root / f"result.csv"
+
     out = pd.concat(list(dataset_result), axis=1)
     out.to_csv(outpath)
 
