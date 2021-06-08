@@ -21,6 +21,7 @@ def main(args):
         all_params.append("_".join(params))
 
     out_df.columns = all_params
+    out_df = out_df.T
     output_path = root_dir / "all_result.csv"
     out_df.to_csv(output_path)
 
