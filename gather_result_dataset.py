@@ -18,7 +18,7 @@ def main(args):
             dataset_dir = dataset_root / Path(e) / Path("result")
         data_pathes = dataset_dir.glob("**/all_result.csv")
         for dp in data_pathes:
-            df = pd.read_csv(dp)
+            df = pd.read_csv(dp, index_col=0)
             columns = df.columns
             upper_columns = [e] * len(df.columns)
             idx = pd.MultiIndex.from_arrays([upper_columns, columns])
