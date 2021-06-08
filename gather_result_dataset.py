@@ -28,7 +28,7 @@ def main(args):
 
     outpath = dataset_root / f"{dataset_type}_result.csv"
     out = pd.concat(list(dataset_result), axis=1)
-    out.to_csv(out, outpath)
+    out.to_csv(outpath)
 
 
 if __name__ == "__main__":
