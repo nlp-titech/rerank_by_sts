@@ -1,5 +1,4 @@
 import argparse
-from collections import defaultdict
 from pathlib import Path
 import pandas as pd
 from load_model import SBERT, MPNET, FAST_TEXT
@@ -8,34 +7,35 @@ EMBEDDINGS = [SBERT, MPNET, FAST_TEXT]
 
 
 def main(args):
-    dataset_path = Path(args.dataset_path)
-    dataset_result = defaultdict(list)
+    dataset_root = Path(args.dataset_path)
+    dataset_type = args.dataset_type
+    dataset_result = []
     for e in EMBEDDINGS:
-        embed_path = dataset_path / Path(e)
-        data_pathes = embed_path.glob("**/all_result.csv")
+        if dataset_type:
+            dataset_dir = dataset_root / Path(e) / Path(f"result_{dataset_type}")
+        else:
+            # for robust04
+            dataset_dir = dataset_root / Path(e) / Path("result")
+        data_pathes = dataset_dir.glob("**/all_result.csv")
         for dp in data_pathes:
-            dataset_name = dp.parts[-2]
             df = pd.read_csv(dp)
             columns = df.columns
             upper_columns = [e] * len(df.columns)
             idx = pd.MultiIndex.from_arrays([upper_columns, columns])
             df.columns = idx
-                
-            dataset_result[dataset_name].append(df)
 
-    for k, v in dataset_result.items():
-        if "_" in k:
-            name = k.split("_")[-1]
+            dataset_result.append(df)
 
-        outpath = dataset_path / f"{name}_result.csv"
-        out = pd.concat(list(v), axis=1)
-        out.to_csv(out, outpath)
+    outpath = dataset_root / f"{dataset_type}_result.csv"
+    out = pd.concat(list(dataset_result), axis=1)
+    out.to_csv(out, outpath)
 
 
 if __name__ == "__main__":
-    parser = argparse.Argumement()
+    parser = argparse.ArgumementParser()
 
     parser.add_argument("-d", dest="dataset_path")
+    parser.add_argument("-t", dest="dataset_type", default="")
 
     args = parser.parse_args()
     main(args)
