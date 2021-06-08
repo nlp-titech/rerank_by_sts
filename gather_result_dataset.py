@@ -32,7 +32,7 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumementParser()
+    parser = argparse.ArgumentParser()
 
     parser.add_argument("-d", dest="dataset_path")
     parser.add_argument("-t", dest="dataset_type", default="")
