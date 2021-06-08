@@ -930,7 +930,7 @@ class T2T_COS_RERANKER(T2T_RERANKER):
 class NWT_RERANKER(T2T_COS_RERANKER):
     def score_func(self, q_rep, d_rep, t_query_id, t_doc_id, qid, drank):
         sim_mat = np.maximum(np.dot(q_rep, d_rep.T), 0)
-        pow_index = np.tile(np.array([self.idf[tq] for tq in t_query_id]), (len(d_rep), 1)).T
+        pow_index = np.tile(np.array([self.idf[tq] for tq in t_query_id]), (len(d_rep), 1)).T + 2.0
         path_score = np.power(sim_mat, pow_index)
         weight = cp.Variable(sim_mat.shape)
         objective = cp.Maximize(cp.sum(cp.log(cp.sum(cp.multiply(weight, path_score), axis=1))))
