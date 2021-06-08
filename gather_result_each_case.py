@@ -11,9 +11,11 @@ def main(args):
     out_df = pd.DataFrame()
     for rf in result_files:
         params = rf.parts[len(p_indir) :]
+        print(params)
         result = dict()
         with rf.open() as f:
             for line in f:
+                print(line)
                 k, v = line.split()
                 result[k] = v
 
