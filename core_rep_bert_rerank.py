@@ -684,9 +684,12 @@ class COEF_POOL_RERANKER(BERT_REP_RERANKER):
         return (1 + coef) * self.ret_score[qid][drank]
 
     def local_q_rep_pooler(self, q_rep, i):
-        raise NotImplementedError
+        return self._local_rep(q_rep, i)
 
     def local_d_rep_pooler(self, d_rep, i):
+        return self._local_rep(d_rep, i)
+
+    def _local_rep(self, rep, i):
         raise NotImplementedError
 
     def coef_pooler(self, this_token_scores):
@@ -697,11 +700,8 @@ class COEF_POOL_RERANKER(BERT_REP_RERANKER):
 
 
 class TOKEN_COEF_POOL_RERANKER(COEF_POOL_RERANKER):
-    def local_q_rep_pooler(self, q_rep, i):
-        return q_rep[i] / np.linalg.norm(q_rep[i])
-
-    def local_d_rep_pooler(self, d_rep, i):
-        return d_rep[i] / np.linalg.norm(d_rep[i])
+    def _local_rep(self, rep, i):
+        return rep[i] / np.linalg.norm(rep[i])
 
     def q_rep_pooler(self, q_embed, t_queru_id):
         return q_embed[1:-1]
@@ -711,28 +711,23 @@ class TOKEN_COEF_POOL_RERANKER(COEF_POOL_RERANKER):
 
 
 class LOCAL_AVE_COEF_POOL_RERANKER(COEF_POOL_RERANKER):
-    def local_q_rep_pooler(self, q_rep, i):
-        return q_rep
-
-    def local_d_rep_pooler(self, d_rep, i):
-        d_start = i - self.window if i - self.window > 0 else 0
-        d_end = i + self.window
-        l_d_rep = np.mean(d_rep[d_start:d_end], axis=0)
-        l_d_norm = np.linalg.norm(l_d_rep)
-        if l_d_norm < 1e-08:
-            l_d_rep = np.zeros(l_d_rep.shape[0])
+    def _local_rep(self, rep, i):
+        start = i - self.window if i - self.window > 0 else 0
+        end = i + self.window
+        l_rep = np.mean(rep[start:end], axis=0)
+        l_norm = np.linalg.norm(l_rep)
+        if l_norm < 1e-08:
+            l_rep = np.zeros(l_rep.shape[0])
         else:
-            l_d_rep /= l_d_norm
+            l_rep /= l_norm
 
-        return l_d_rep
+        return l_rep
 
     def q_rep_pooler(self, q_embed, t_query_id):
-        q_rep = np.mean(q_embed[1:-1], axis=0)
-        q_rep /= np.linalg.norm(q_rep)
-        return q_rep
+        return q_embed[1:-1]
 
     def d_rep_pooler(self, d_embed, t_doc_id):
-        return d_embed
+        return d_embed[1:-1]
 
 
 class LOCAL_SOFT_BM25_RERANKER(BERT_REP_RERANKER):
@@ -792,19 +787,19 @@ class LOCAL_SOFT_BM25_RERANKER(BERT_REP_RERANKER):
         doc_score = self.calc_bm25_each_token(soft_tf, doc_len)
         return doc_score
 
-    def local_q_rep_pooler(self, i):
-        raise NotImplementedError
+    def local_q_rep_pooler(self, q_rep, i):
+        return self._local_rep(q_rep, i)
 
-    def local_d_rep_pooler(self, i):
+    def local_d_rep_pooler(self, d_rep, i):
+        return self._local_rep(d_rep, i)
+
+    def _local_rep(self, rep, i):
         raise NotImplementedError
 
 
 class TOKEN_SOFT_BM25_RERANKER(LOCAL_SOFT_BM25_RERANKER):
-    def local_q_rep_pooler(self, q_rep, i):
-        return q_rep[i] / np.linalg.norm(q_rep[i])
-
-    def local_d_rep_pooler(self, d_rep, i):
-        return d_rep[i] / np.linalg.norm(d_rep[i])
+    def _local_rep(self, rep, i):
+        return rep[i] / np.linalg.norm(rep[i])
 
     def q_rep_pooler(self, q_embed, t_query_id):
         return q_embed[1:-1]
@@ -814,28 +809,23 @@ class TOKEN_SOFT_BM25_RERANKER(LOCAL_SOFT_BM25_RERANKER):
 
 
 class LOCAL_AVE_SOFT_BM25_RERANKER(LOCAL_SOFT_BM25_RERANKER):
-    def local_q_rep_pooler(self, q_rep, i):
-        return q_rep
-
-    def local_d_rep_pooler(self, d_rep, i):
-        d_start = i - self.window if i - self.window > 0 else 0
-        d_end = i + self.window
-        l_d_rep = np.mean(d_rep[d_start:d_end], axis=0)
-        l_d_norm = np.linalg.norm(l_d_rep)
-        if l_d_norm < 1e-08:
-            l_d_rep = np.zeros(l_d_rep.shape[0])
+    def _local_rep(self, rep, i):
+        start = i - self.window if i - self.window > 0 else 0
+        end = i + self.window
+        l_rep = np.mean(rep[start:end], axis=0)
+        l_norm = np.linalg.norm(l_rep)
+        if l_norm < 1e-08:
+            l_rep = np.zeros(l_rep.shape[0])
         else:
-            l_d_rep /= l_d_norm
+            l_rep /= l_norm
 
-        return l_d_rep
+        return l_rep
 
     def q_rep_pooler(self, q_embed, t_query_id):
-        q_rep = np.mean(q_embed[1:-1], axis=0)
-        q_rep /= np.linalg.norm(q_rep)
-        return q_rep
+        return q_embed[1:-1]
 
     def d_rep_pooler(self, d_embed, t_doc_id):
-        return d_embed
+        return d_embed[1:-1]
 
 
 class GLOBAL_SOFT_BM25_RERANKER(LOCAL_SOFT_BM25_RERANKER):
@@ -933,13 +923,19 @@ class MAX_SOFT_TF(BERT_REP_RERANKER):
 
         return score
 
-
-class TOKEN_MAX_SOFT_TF_COS(MAX_SOFT_TF):
     def local_q_rep_pooler(self, q_rep, i):
-        return q_rep[i] / np.linalg.norm(q_rep[i])
+        return self._local_rep(q_rep, i)
 
     def local_d_rep_pooler(self, d_rep, i):
-        return d_rep[i] / np.linalg.norm(d_rep[i])
+        return self._local_rep(d_rep, i)
+
+    def _local_rep(self, rep, i):
+        raise NotImplementedError
+
+
+class TOKEN_MAX_SOFT_TF_COS(MAX_SOFT_TF):
+    def _local_rep(self, rep, i):
+        return rep[i] / np.linalg.norm(rep[i])
 
     def q_rep_pooler(self, q_embed, t_query_id):
         return q_embed[1:-1]
@@ -949,11 +945,8 @@ class TOKEN_MAX_SOFT_TF_COS(MAX_SOFT_TF):
 
 
 class TOKEN_MAX_SOFT_TF_DOT(MAX_SOFT_TF):
-    def local_q_rep_pooler(self, q_rep, i):
-        return q_rep[i]
-
-    def local_d_rep_pooler(self, d_rep, i):
-        return d_rep[i]
+    def _local_rep(self, rep, i):
+        return rep[i]
 
     def q_rep_pooler(self, q_embed, t_query_id):
         return q_embed[1:-1]
@@ -963,43 +956,34 @@ class TOKEN_MAX_SOFT_TF_DOT(MAX_SOFT_TF):
 
 
 class LOCAL_AVE_MAX_SOFT_TF_COS(MAX_SOFT_TF):
-    def local_q_rep_pooler(self, q_rep, i):
-        return q_rep
-
-    def local_d_rep_pooler(self, d_rep, i):
-        d_start = i - self.window if i - self.window > 0 else 0
-        d_end = i + self.window
-        local_d_rep = np.mean(d_rep[d_start:d_end], axis=0)
-        d_norm = np.linalg.norm(local_d_rep)
-        if d_norm < 1e-08:
-            local_d_rep = np.zeros(local_d_rep.shape[0])
+    def _local_rep(self, rep, i):
+        start = i - self.window if i - self.window > 0 else 0
+        end = i + self.window
+        local_rep = np.mean(rep[start:end], axis=0)
+        norm = np.linalg.norm(local_rep)
+        if norm < 1e-08:
+            local_rep = np.zeros(local_rep.shape[0])
         else:
-            local_d_rep /= d_norm
+            local_rep /= norm
 
-        return local_d_rep
+        return local_rep
 
     def q_rep_pooler(self, q_embed, t_query_id):
-        q_rep = np.mean(q_embed[1:-1], axis=0)
-        q_rep /= np.linalg.norm(q_rep)
-        return q_rep
+        return q_embed[1:-1]
 
     def d_rep_pooler(self, d_embed, t_doc_id):
         return d_embed[1:-1]
 
 
 class LOCAL_AVE_MAX_SOFT_TF_DOT(MAX_SOFT_TF):
-    def local_q_rep_pooler(self, q_rep, i):
-        return q_rep
-
-    def local_d_rep_pooler(self, d_rep, i):
-        d_start = i - self.window if i - self.window > 0 else 0
-        d_end = i + self.window
-        local_d_rep = np.mean(d_rep[d_start:d_end], axis=0)
-        return local_d_rep
+    def _local_d_rep_pooler(self, rep, i):
+        start = i - self.window if i - self.window > 0 else 0
+        end = i + self.window
+        local_rep = np.mean(rep[start:end], axis=0)
+        return local_rep
 
     def q_rep_pooler(self, q_embed, t_query_id):
-        q_rep = np.mean(q_embed[1:-1], axis=0)
-        return q_rep
+        return q_embed[1:-1]
 
     def d_rep_pooler(self, d_embed, t_doc_id):
         return d_embed[1:-1]
