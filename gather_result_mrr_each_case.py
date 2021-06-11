@@ -15,7 +15,7 @@ def main(args):
         with rf.open() as f:
             for line in f:
                 if "MRR" in line:
-                    score = line.split(":")[-1].stirp()
+                    score = line.split(":")[-1].strip()
                     result["MRR@10"] = score
 
         out_df = pd.concat((out_df, pd.Series(result)), axis=1)
