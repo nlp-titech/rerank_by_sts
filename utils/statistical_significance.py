@@ -74,7 +74,12 @@ def main():
     first_scores = [first_results[query_id][measure] for query_id in query_ids]
     second_scores = [second_results[query_id][measure] for query_id in query_ids]
 
-    print((round(np.mean(first_scores),4), round(np.std(first_score), 4) (round(np.mean(second_scores), 4), round(np.std(second_score), 4)), scipy.stats.ttest_rel(first_scores, second_scores))
+    print(
+        (round(np.mean(first_scores), 4), round(np.std(first_scores), 4))(
+            round(np.mean(second_scores), 4), round(np.std(second_scores), 4)
+        ),
+        scipy.stats.ttest_rel(first_scores, second_scores),
+    )
 
 
 if __name__ == "__main__":
