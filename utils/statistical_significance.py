@@ -27,6 +27,7 @@ SOFTWARE.
 import argparse
 import os
 import scipy.stats
+import numpy as np
 import sys
 
 import pytrec_eval
@@ -73,7 +74,7 @@ def main():
     first_scores = [first_results[query_id][measure] for query_id in query_ids]
     second_scores = [second_results[query_id][measure] for query_id in query_ids]
 
-    print(scipy.stats.ttest_rel(first_scores, second_scores))
+    print(np.mean(first_scores), np.mean(second_scores), scipy.stats.ttest_rel(first_scores, second_scores))
 
 
 if __name__ == "__main__":
