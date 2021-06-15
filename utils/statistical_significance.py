@@ -76,9 +76,11 @@ def main():
 
     print(
         round(np.mean(first_scores), 4),
-        round(np.std(first_scores), 4),
+        round(np.std(first_scores, ddof=1), 4),
         round(np.mean(second_scores), 4),
-        round(np.std(second_scores), 4),
+        round(np.std(second_scores, ddof=1), 4),
+        round(np.mean(first_scores - second_scores), 4),
+        round(np.std(first_scores - second_scores, ddof=1), 4),
         scipy.stats.ttest_rel(first_scores, second_scores),
     )
 
