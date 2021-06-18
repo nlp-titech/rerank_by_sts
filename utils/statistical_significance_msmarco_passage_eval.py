@@ -138,7 +138,7 @@ def compute_metrics(qids_to_relevant_passageids, qids_to_ranked_candidate_passag
                 if candidate_pid[i] in target_pid:
                     MRR += 1 / (i + 1)
                     rr_ranking.pop()
-                    rr_ranking.append(i + 1)
+                    rr_ranking.append(1 / (i + 1))
                     break
     if len(rr_ranking) == 0:
         raise IOError("No matching QIDs found. Are you sure you are scoring the evaluation set?")
