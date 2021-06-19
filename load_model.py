@@ -7,6 +7,9 @@ SBERT_GEN = "sbert_gen"
 MPNET = "mpnet"
 FAST_TEXT = "fast_text"
 
+BERT_BASE_MODEL = {SBERT, MPNET, SBERT_GEN}
+W2V_BASE_MODEL = {FAST_TEXT}
+
 
 def load_model(pretrain_model_type, model_path=""):
     if pretrain_model_type.lower() == SBERT:

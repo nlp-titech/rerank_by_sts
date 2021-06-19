@@ -6,7 +6,7 @@ import numpy as np
 
 import core_rep_bert_rerank
 import core_rep_w2v_rerank
-from load_model import load_tokenizer, SBERT, MPNET, FAST_TEXT
+from load_model import load_tokenizer, BERT_BASE_MODEL, W2V_BASE_MODEL
 from load_data import load_doc, load_query, load_retreival_result, load_stats
 from file_path_setteing import DOC, QUERY, DF, DOC_LEN, RERANK_SCORE, STATS
 
@@ -57,7 +57,7 @@ def main(args):
     idf = core_rep_bert_rerank.OOV1_dict(idf)
     doc_len_ave = np.mean(doc_len)
 
-    if args.pretrain_model in {SBERT, MPNET}:
+    if args.pretrain_model in BERT_BASE_MODEL:
         reranker = core_rep_bert_rerank.reranker_factory(
             func_mode,
             pooler,
@@ -74,7 +74,7 @@ def main(args):
             bm25_k1=args.bm25_k1,
             bm25_b=args.bm25_b,
         )
-    elif args.pretrain_model in {FAST_TEXT}:
+    elif args.pretrain_model in W2V_BASE_MODEL:
         reranker = core_rep_w2v_rerank.reranker_factory(
             func_mode,
             pooler,
@@ -91,6 +91,8 @@ def main(args):
             bm25_k1=args.bm25_k1,
             bm25_b=args.bm25_b,
         )
+    else:
+        raise ValueError(f"{args.pretrain_model} mode doesn't exist")
 
     scores = reranker.rerank(queries, docs)
 
