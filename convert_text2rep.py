@@ -138,7 +138,7 @@ def main(args):
     pretrain_model = args.pretrain_model
     retrieval_result_path = Path(args.first_rank_path)
 
-    if pretrain_model in {SBERT, MPNET}:
+    if pretrain_model in {SBERT, MPNET, SBERT_GEN}:
         model = load_model(pretrain_model, model_path)
         tokenizer = load_tokenizer(pretrain_model)
         device = torch.device("cuda")
