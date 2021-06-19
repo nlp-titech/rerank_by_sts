@@ -5,7 +5,7 @@ import numpy as np
 
 from tqdm import tqdm
 
-from load_model import load_model, load_tokenizer, SBERT, MPNET, FAST_TEXT, SBERT_GEN
+from load_model import load_model, load_tokenizer, BERT_BASE_MODEL, W2V_BASE_MODEL
 from load_data import load_doc, load_query, load_retreival_result
 from file_path_setteing import DOC, QUERY
 
@@ -15,9 +15,6 @@ MAX_LENGTH = 512
 Q_MODE = "query"
 D_MODE = "doc"
 B_MODE = "both"
-
-BERT_BASE_MODEL = {SBERT, MPNET, SBERT_GEN}
-W2V_BASE_MODEL = {FAST_TEXT}
 
 
 def encode_and_save_batch(output_dir, model, t_batch_doc, max_doc_length, att_masks, batch_doc_did, device):
