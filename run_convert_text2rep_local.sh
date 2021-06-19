@@ -1,39 +1,16 @@
-#!/bin/bash
+OUTDIR="./test/msmarco_document/sbert/"
+# OUTDIR="./test/robust04/fast_text"
+#  -d /home/gaia_data/iida.h/msmarco/passage/collection_and_queries/collection_jsonl/docs \
+# -q /home/gaia_data/iida.h/msmarco/passage/collection_and_queries/msmarco-test2019-queries.tsv \
+#  -rp /home/gaia_data/iida.h/msmarco/passage/experiment/bm25/run.msmarco-passage.test2019.bm25-tuned.trec \
 
-#$ -l s_gpu=1
-#$ -l h_rt=12:00:00
-#$ -j y
-#$ -cwd
-#$ -m abe
-#$ -M iida.h.ac@m.titech.ac.jp
-
-dinput=$1
-qinput=$2
-OUTDIR=$3
-PRETRAIN_MODEL=$4
-RETRIEVAL_PATH=$5
-BATCH_SIZE=$6
-
-. /etc/profile.d/modules.sh
-module load gcc/8.3.0
-module load python/3.9.2
-module load cuda/11.0.194
-source ~/.bash_profile
-source ~/env/rerank_sts/bin/activate
-module load intel
-
-echo $dinput
-echo $qinput
-echo $OUTDIR
-echo $PRETRAIN_MODEL
-echo $BATCH_SIZE
 
 
 python convert_text2rep.py \
- -d ${dinput} \
- -q ${qinput} \
+ -d /home/gaia_data/iida.h/msmarco/document/msmarco-docs-json-all-in-contents/ \
+ -q /home/gaia_data/iida.h/msmarco/document/msmarco-test2019-queries.tsv \
+ -rp /home/gaia_data/iida.h/msmarco/document/run.msmarco-doc.test2019.bm25-tuned.trec \
  -o ${OUTDIR} \
- -p ${PRETRAIN_MODEL} \
- -rp ${RETRIEVAL_PATH} \
- -m /home/gaia_data/iida.h/msmarco/passage/trained_model/fast-text_msmarco-finetune.bin \
- --batch_size ${BATCH_SIZE}
+ -p sbert \
+ -m /home/gaia_data/iida.h/msmarco/passage/trained_model/crawl-300d-2M-subword_msmarco_passage_finetune_analzer.bin
+ # --batch_size 128
