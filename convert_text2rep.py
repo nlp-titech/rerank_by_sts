@@ -5,7 +5,7 @@ import numpy as np
 
 from tqdm import tqdm
 
-from load_model import load_model, load_tokenizer, SBERT, MPNET, FAST_TEXT
+from load_model import load_model, load_tokenizer, SBERT, MPNET, FAST_TEXT, SBERT_GEN
 from load_data import load_doc, load_query, load_retreival_result
 from file_path_setteing import DOC, QUERY
 
@@ -164,7 +164,7 @@ def main(args):
         q_output_dir = output_dir / QUERY
         q_output_dir.mkdir(exist_ok=True, parents=True)
 
-        if pretrain_model in {SBERT, MPNET}:
+        if pretrain_model in {SBERT, MPNET, SBERT_GEN}:
             encode_and_save_query_bert(q_output_dir, queries, batch_size, tokenizer, model, device)
         elif pretrain_model in {FAST_TEXT}:
             encode_and_save_query_w2v(q_output_dir, queries, tokenizer, model)
