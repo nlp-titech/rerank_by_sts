@@ -16,6 +16,9 @@ Q_MODE = "query"
 D_MODE = "doc"
 B_MODE = "both"
 
+BERT_BASE_MODEL = {SBERT, MPNET, SBERT_GEN}
+W2V_BASE_MODEL = {FAST_TEXT}
+
 
 def encode_and_save_batch(output_dir, model, t_batch_doc, max_doc_length, att_masks, batch_doc_did, device):
     if max_doc_length > MAX_LENGTH:
@@ -123,10 +126,12 @@ def encode_and_save_retrieval(
 ):
     for qid in tqdm(queries.keys()):
         dids = retrieval_result[qid]
-        if pretrain_model in {SBERT, MPNET}:
+        if pretrain_model in BERT_BASE_MODEL:
             encode_and_save_doc_bert(output_dir, batch_size, tokenizer, qid, dids, docs, model, device)
-        elif pretrain_model in {FAST_TEXT}:
+        elif pretrain_model in W2V_BASE_MODEL:
             encode_and_save_doc_w2v(output_dir, tokenizer, qid, dids, docs, model)
+        else:
+            raise ValueError(f"{pretrain_model} doesn't exist")
 
 
 def main(args):
@@ -138,15 +143,17 @@ def main(args):
     pretrain_model = args.pretrain_model
     retrieval_result_path = Path(args.first_rank_path)
 
-    if pretrain_model in {SBERT, MPNET, SBERT_GEN}:
+    if pretrain_model in BERT_BASE_MODEL:
         model = load_model(pretrain_model, model_path)
         tokenizer = load_tokenizer(pretrain_model)
         device = torch.device("cuda")
         model.to(device)
-    else:
+    elif pretrain_model in W2V_BASE_MODEL:
         model = load_model(pretrain_model, model_path)
         tokenizer = load_tokenizer(pretrain_model)
         device = None
+    else:
+        raise ValueError(f"{pretrain_model} doesn't exist")
 
     queries = load_query(query_path)
 
@@ -164,10 +171,12 @@ def main(args):
         q_output_dir = output_dir / QUERY
         q_output_dir.mkdir(exist_ok=True, parents=True)
 
-        if pretrain_model in {SBERT, MPNET, SBERT_GEN}:
+        if pretrain_model in BERT_BASE_MODEL:
             encode_and_save_query_bert(q_output_dir, queries, batch_size, tokenizer, model, device)
-        elif pretrain_model in {FAST_TEXT}:
+        elif pretrain_model in W2V_BASE_MODEL:
             encode_and_save_query_w2v(q_output_dir, queries, tokenizer, model)
+        else:
+            raise ValueError(f"{pretrain_model} doesn't exist")
 
     if args.mode in {D_MODE, B_MODE}:
         d_output_dir = output_dir / DOC
