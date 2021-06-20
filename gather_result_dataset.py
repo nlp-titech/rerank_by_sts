@@ -1,9 +1,9 @@
 import argparse
 from pathlib import Path
 import pandas as pd
-from load_model import SBERT, MPNET, FAST_TEXT
+from load_model import BERT_BASE_MODEL, W2V_BASE_MODEL
 
-EMBEDDINGS = [SBERT, MPNET, FAST_TEXT]
+EMBEDDINGS = BERT_BASE_MODEL | W2V_BASE_MODEL
 
 
 def main(args):
