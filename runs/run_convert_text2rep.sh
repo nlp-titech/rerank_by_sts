@@ -15,8 +15,6 @@ echo $PRETRAIN_MODEL
 echo $BATCH_SIZE
 echo $MODEL_PATH
 
-W2V_PATH="/PATH/TO/W2V"
-
 
 python ../src/convert_text2rep.py \
  -d ${dinput} \
