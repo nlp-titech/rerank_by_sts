@@ -2,6 +2,7 @@ import argparse
 from pathlib import Path
 import torch
 import numpy as np
+import re
 
 from tqdm import tqdm
 
@@ -123,7 +124,7 @@ def encode_and_save_retrieval(
 ):
     for qid in tqdm(queries.keys()):
         dids = retrieval_result[qid]
-        if pretrain_model in BERT_BASE_MODEL:
+        if pretrain_model in BERT_BASE_MODEL or re.match("sbert", pretrain_model):
             encode_and_save_doc_bert(output_dir, batch_size, tokenizer, qid, dids, docs, model, device)
         elif pretrain_model in W2V_BASE_MODEL:
             encode_and_save_doc_w2v(output_dir, tokenizer, qid, dids, docs, model)
@@ -140,9 +141,9 @@ def main(args):
     pretrain_model = args.pretrain_model
     retrieval_result_path = Path(args.first_rank_path)
 
-    if pretrain_model in BERT_BASE_MODEL:
+    if pretrain_model in BERT_BASE_MODEL or re.match("sbert", pretrain_model):
         model = load_model(pretrain_model, model_path)
-        tokenizer = load_tokenizer(pretrain_model)
+        tokenizer = load_tokenizer(pretrain_model, model_path)
         device = torch.device("cuda")
         model.to(device)
     elif pretrain_model in W2V_BASE_MODEL:
@@ -150,6 +151,7 @@ def main(args):
         tokenizer = load_tokenizer(pretrain_model)
         device = None
     else:
+        print(re.match("sbert", pretrain_model))
         raise ValueError(f"{pretrain_model} doesn't exist")
 
     queries = load_query(query_path)
@@ -168,7 +170,7 @@ def main(args):
         q_output_dir = output_dir / QUERY
         q_output_dir.mkdir(exist_ok=True, parents=True)
 
-        if pretrain_model in BERT_BASE_MODEL:
+        if pretrain_model in BERT_BASE_MODEL or re.match("sbert", pretrain_model):
             encode_and_save_query_bert(q_output_dir, queries, batch_size, tokenizer, model, device)
         elif pretrain_model in W2V_BASE_MODEL:
             encode_and_save_query_w2v(q_output_dir, queries, tokenizer, model)
