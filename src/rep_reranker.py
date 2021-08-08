@@ -6,7 +6,7 @@ import numpy as np
 
 import core_rep_bert_rerank
 import core_rep_w2v_rerank
-from load_model import load_tokenizer, BERT_BASE_MODEL, W2V_BASE_MODEL
+from load_model import load_tokenizer, BERT_BASE_MODELS, W2V_BASE_MODEL
 from load_data import load_doc, load_query, load_retreival_result, load_stats
 from file_path_setteing import DOC, QUERY, DF, DOC_LEN, RERANK_SCORE, STATS
 
@@ -28,7 +28,7 @@ def main(args):
     print(use_idf)
     retrieval_result_path = Path(args.first_rank_path)
 
-    tokenizer = load_tokenizer(args.pretrain_model, args.tokenizer_path)
+    tokenizer = load_tokenizer(args.pretrain_model)
 
     queries = load_query(query_path)
     docs = load_doc(doc_path)
@@ -57,7 +57,7 @@ def main(args):
     idf = core_rep_bert_rerank.OOV1_dict(idf)
     doc_len_ave = np.mean(doc_len)
 
-    if args.pretrain_model in BERT_BASE_MODEL:
+    if args.pretrain_model in BERT_BASE_MODELS:
         reranker = core_rep_bert_rerank.reranker_factory(
             func_mode,
             pooler,

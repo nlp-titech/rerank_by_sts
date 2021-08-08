@@ -5,6 +5,7 @@ FUNC=$1
 POOLER=$2
 PRETRAIN_MODEL=$3
 USE_IDF=$4
+TOKENIZER_PATH=$5
 OUTDIR=${ROOTDIR}/${PRETRAIN_MODEL}/result/${FUNC}/${POOLER}/${USE_IDF}
 EMBED_DIR=${ROOTDIR}/${PRETRAIN_MODEL}
 STATS_DIR=${ROOTDIR}/${PRETRAIN_MODEL}
@@ -28,6 +29,7 @@ python ../src/rep_reranker.py \
  -sd ${STATS_DIR} \
  -rp $RUN_RETRIEVER_PATH \
  -pm ${PRETRAIN_MODEL} \
+ -t ${TOKENIZER_PATH} \
  --use_idf ${USE_IDF} \
  --top_k 1000 \
  --bm25_k1 0.9 \

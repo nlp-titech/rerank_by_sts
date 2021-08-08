@@ -6,7 +6,7 @@ import re
 
 from tqdm import tqdm
 
-from load_model import load_model, load_tokenizer, BERT_BASE_MODEL, W2V_BASE_MODEL
+from load_model import load_model, load_tokenizer, BERT_BASE_MODELS, W2V_BASE_MODEL
 from load_data import load_doc, load_query, load_retreival_result
 from file_path_setteing import DOC, QUERY
 
@@ -124,7 +124,7 @@ def encode_and_save_retrieval(
 ):
     for qid in tqdm(queries.keys()):
         dids = retrieval_result[qid]
-        if pretrain_model in BERT_BASE_MODEL or re.match("sbert", pretrain_model):
+        if pretrain_model in BERT_BASE_MODELS:
             encode_and_save_doc_bert(output_dir, batch_size, tokenizer, qid, dids, docs, model, device)
         elif pretrain_model in W2V_BASE_MODEL:
             encode_and_save_doc_w2v(output_dir, tokenizer, qid, dids, docs, model)
@@ -141,9 +141,9 @@ def main(args):
     pretrain_model = args.pretrain_model
     retrieval_result_path = Path(args.first_rank_path)
 
-    if pretrain_model in BERT_BASE_MODEL or re.match("sbert", pretrain_model):
+    if pretrain_model in BERT_BASE_MODELS:
         model = load_model(pretrain_model, model_path)
-        tokenizer = load_tokenizer(pretrain_model, model_path)
+        tokenizer = load_tokenizer(pretrain_model)
         device = torch.device("cuda")
         model.to(device)
     elif pretrain_model in W2V_BASE_MODEL:
@@ -170,7 +170,7 @@ def main(args):
         q_output_dir = output_dir / QUERY
         q_output_dir.mkdir(exist_ok=True, parents=True)
 
-        if pretrain_model in BERT_BASE_MODEL or re.match("sbert", pretrain_model):
+        if pretrain_model in BERT_BASE_MODELS:
             encode_and_save_query_bert(q_output_dir, queries, batch_size, tokenizer, model, device)
         elif pretrain_model in W2V_BASE_MODEL:
             encode_and_save_query_w2v(q_output_dir, queries, tokenizer, model)
