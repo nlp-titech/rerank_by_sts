@@ -1,9 +1,13 @@
 import argparse
 from pathlib import Path
-import pandas as pd
-from load_model import BERT_BASE_MODEL, W2V_BASE_MODEL
+import sys
 
-EMBEDDINGS = BERT_BASE_MODEL | W2V_BASE_MODEL
+sys.path.append("../src/")
+
+import pandas as pd
+from load_model import BERT_BASE_MODELS, W2V_BASE_MODEL
+
+EMBEDDINGS = set(BERT_BASE_MODELS) | W2V_BASE_MODEL
 
 
 def main(args):
