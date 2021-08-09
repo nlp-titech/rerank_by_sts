@@ -14,7 +14,7 @@ elif [ $TYPE = "msmarco_passage_test" ]; then
   RTYPE="result_test"
   DTYPE="test"
 elif [ $TYPE = "msmarco_document_test" ]; then
-  INDIR="/gs/hs0/tga-nlp-titech/iida.h/rerank_by_sts/msmarco_document/"
+  INDIR="/PATH/TO/DATASET/ROOT/"
   RTYPE="result_test"
   DTYPE="test"
 fi

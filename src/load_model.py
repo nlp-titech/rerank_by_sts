@@ -13,7 +13,7 @@ BERT_BASE_MODELS = {
     "sbert_gen": "sentence-transformers/paraphrase-mpnet-base-v2",
     "mpnet": "microsoft/mpnet-base",
     "sbert_msmarco_sts_best": "/home/iida.h/work/sentence-transformers/examples/training/paraphrases/output/training_paraphrases_microsoft-mpnet-base-2021-07-19_23-31-19/",
-    "sbert_msmarco_1epoch": "/PATH/TO/MODEL_DIR",
+    "sbert_msmarco_1epoch": "//home/iida.h/work/sentence-transformers/examples/training/paraphrases/output/training_paraphrases_microsoft-mpnet-base-2021-07-19_23-31-19/732490",
 }
 
 # BERT_BASE_MODEL = {SBERT, MPNET, SBERT_GEN}
