@@ -14,6 +14,7 @@ BERT_BASE_MODELS = {
     "mpnet": "microsoft/mpnet-base",
     "sbert_msmarco_sts_best": "/home/iida.h/work/sentence-transformers/examples/training/paraphrases/output/training_paraphrases_microsoft-mpnet-base-2021-07-19_23-31-19/",
     "sbert_msmarco_1epoch": "//home/iida.h/work/sentence-transformers/examples/training/paraphrases/output/training_paraphrases_microsoft-mpnet-base-2021-07-19_23-31-19/732490",
+    "coil": "/home/iida.h/work/rerank_sts/test/models/coil-hn-checkpoint",
 }
 
 # BERT_BASE_MODEL = {SBERT, MPNET, SBERT_GEN}

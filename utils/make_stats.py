@@ -1,3 +1,7 @@
+import sys
+
+sys.path.append("../src/")
+
 import argparse
 from collections import Counter
 import json
