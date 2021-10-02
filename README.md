@@ -35,7 +35,7 @@ Actually `DOCUMENT_PATH`, `QUERY_PATH` and `RETRIEVA_PATH` is fixed with target 
 
 
 ## run_experiment
-Please execute `run_rep_rerank_<task_name>.sh` for each target task. First, please set `DOC_PATH`, `QUERY_PATH`, `RUN_RETRIEVER_PATH`, `QREL_PATH`, `ROOT_DIR` in `run_rep_rerank_<task_name>.sh`. In addition, please set `ROOT_DIR` to the same path as `${EXPERIMENT_ROOT_DIR}/<task_name>` where you set the path as rewrite path in the bash file, and execute it like following.
+Please execute `run_rep_rerank_<task_name>.sh` for each target task. Please set `DOC_PATH`, `QUERY_PATH`, `RUN_RETRIEVER_PATH`, `QREL_PATH`, `ROOT_DIR` in `run_rep_rerank_<task_name>.sh`. You nees to set `ROOT_DIR` to the same path as `${EXPERIMENT_ROOT_DIR}/<task_name>` where you set the path as rewrite path in the bash file, and execute it like following.
 
 ```
 $ cd runs/
@@ -53,7 +53,7 @@ You need to use the same `<task_name>` as the `run_rep_rerank_<task_name>.sh`
 
 
 ## evaluation
-After running experiment, execute `gather_result.sh` to output final evaluation. 
+After running experiment, execute `gather_result.sh` to output the final evaluation. 
 Firstly, please set `INDIR` to the same path as `${EXPERIMENT_ROOT_DIR}/<task_name>` in `gather_result.sh`. Then execute the script like the following
 
 ```
@@ -61,8 +61,10 @@ $ cd runs/
 $ bash gather_result.sh <task_name>
 ```
 
-The script outputs the result of each pretrain_model at `INDIR/all_result.csv`
-To execute MRR on msmaro passage, please run `gathre_result_mrr.sh`
+The script outputs the result of each pretrain_model at `INDIR/$PRETRAIN_MODEL/all_result.csv`.
+For msmarco, the result of all parameters is output at `INDIR/<dev/test> _result.csv`.
+For robust04, the result of all parameters is output at `INDIR/result.csv`.
+To execute MRR on msmaro passage, please run `gathre_result_mrr.sh`.
 
 ## significance test
 The code for significance test is `run_statistical_significance.sh`
