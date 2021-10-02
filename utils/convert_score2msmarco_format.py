@@ -11,7 +11,6 @@ def main(args):
         for sqid, sdids in scores.items():
             hit_ids = [(sd, score) for sd, score in sorted(sdids.items(), key=lambda x: -x[1])][: args.top_k]
             for i, hi in enumerate(hit_ids):
-                # line = "\t".join((sqid, hi[0], str(i + 1), str(hi[1])))
                 line = "\t".join((sqid, hi[0], str(i + 1)))
                 print(line, file=g)
 

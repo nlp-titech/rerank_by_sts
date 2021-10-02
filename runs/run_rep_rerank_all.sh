@@ -9,7 +9,7 @@ pooler_g1=("cls" "ave" "max" "token" "local_ave")
 func_g2=("max_soft_dot" "max_soft_cos")
 pooler_g2=("token" "local_ave")
 
-func_g3=("t2t_dot" "t2t_cos" "nwt")
+func_g3=("t2t_dot" "t2t_cos")
 
 pretrain_model=("sbert_gen" "sbert" "mpnet" "fast_text")
 

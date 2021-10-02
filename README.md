@@ -26,7 +26,7 @@ You can encode tokens to vectors by using `run_convert_text2rep.sh`.
 
 ```
 $ cd runs/
-$ bash run_convert_text2rep.sh $DOCUMENT_PATH $QUERY_PATH $OUTPUT_DIR $PRETRAIN_MODEL RETRIEVAL_PATH BATCH_SIZE
+$ bash run_convert_text2rep.sh $DOCUMENT_PATH $QUERY_PATH $OUTPUT_DIR $PRETRAIN_MODEL $RETRIEVAL_PATH $BATCH_SIZE
 ```
 
 The file of `RETRIEVAL_PATH` includes the result of bm25 top-n with trec format. You can also make this file by [`anserini`](https://github.com/castorini/anserini)
@@ -35,7 +35,8 @@ Actually `DOCUMENT_PATH`, `QUERY_PATH` and `RETRIEVA_PATH` is fixed with target 
 
 
 ## run_experiment
-Please execute `run_rep_rerank_<task_name>.sh` for each target task. First, please rewrite `ROOT_DIR` to `${EXPERIMENT_ROOT_DIR}` where you set the path as rewrite path in the bash file, and execute it like following.
+Please execute `run_rep_rerank_<task_name>.sh` for each target task. First, please set `DOC_PATH`, `QUERY_PATH`, `RUN_RETRIEVER_PATH`, `QREL_PATH`, `ROOT_DIR` in `run_rep_rerank_<task_name>.sh`. In addition, please set `ROOT_DIR` to the same path as `${EXPERIMENT_ROOT_DIR}/<task_name>` where you set the path as rewrite path in the bash file, and execute it like following.
+
 ```
 $ cd runs/
 $ bash run_rep_rerank_<task_name>.sh $FUNC $POOLER $PRETRAIN_MODEL $USE_IDF 
@@ -48,4 +49,27 @@ $ cd runs/
 $ bash run_rep_rerank_all.sh <task_name>
 ```
 
-You need use the same `<task_name>` as the `run_rep_rerank_<task_name>.sh`
+You need to use the same `<task_name>` as the `run_rep_rerank_<task_name>.sh`
+
+
+## evaluation
+After running experiment, execute `gather_result.sh` to output final evaluation. 
+Firstly, please set `INDIR` to the same path as `${EXPERIMENT_ROOT_DIR}/<task_name>` in `gather_result.sh`. Then execute the script like the following
+
+```
+$ cd runs/
+$ bash gather_result.sh <task_name>
+```
+
+The script outputs the result of each pretrain_model at `INDIR/all_result.csv`
+To execute MRR on msmaro passage, please run `gathre_result_mrr.sh`
+
+## significance test
+The code for significance test is `run_statistical_significance.sh`
+Fill in the blank path following the previous setting and execute it.
+
+```
+$ cd runs/
+$ bash run_statistical_significance.sh <task_name>
+```
+
