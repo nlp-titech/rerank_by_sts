@@ -64,7 +64,7 @@ $ bash gather_result.sh <task_name>
 The script outputs the result of each pretrain_model at `INDIR/$PRETRAIN_MODEL/all_result.csv`.
 For msmarco, the result of all parameters is output at `INDIR/<dev/test> _result.csv`.
 For robust04, the result of all parameters is output at `INDIR/result.csv`.
-To execute MRR on msmaro passage, please run `gathre_result_mrr.sh`.
+To execute evaluation on msmaro passage dev, please run `gathre_result_mrr.sh`.
 
 ## significance test
 The code for significance test is `run_statistical_significance.sh`
@@ -74,4 +74,6 @@ Fill in the blank path following the previous setting and execute it.
 $ cd runs/
 $ bash run_statistical_significance.sh <task_name>
 ```
+
+To execute significance test on msmaro passage dev, please run `run_stats_significance_msmarco_passage_dev.sh`.
 
