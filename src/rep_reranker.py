@@ -112,7 +112,6 @@ if __name__ == "__main__":
     parser.add_argument("-f", dest="func_mode")
     parser.add_argument("-p", dest="pooler")
     parser.add_argument("-pm", dest="pretrain_model")
-    parser.add_argument("-t", dest="tokenizer_path", default="")
     parser.add_argument("-rp", dest="first_rank_path")
     parser.add_argument("--use_idf", type=int)
     parser.add_argument("--window", type=int, default=5)
